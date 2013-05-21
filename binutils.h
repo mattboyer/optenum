@@ -42,3 +42,4 @@ SUCH DAMAGE.
 #include <libiberty.h>
 #include <dis-asm.h>
 
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
