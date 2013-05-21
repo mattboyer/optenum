@@ -83,4 +83,4 @@ int buf_fprintf(struct disassembly_pseudo_file *, const char *, ...);
 
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=8 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */

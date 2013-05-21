@@ -16,4 +16,4 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *, const u
 static const char *dest_registers[] = {"", "%rdi", "%rsi", "%edx", "%ecx", "%r8", "%r9"};
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=8 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */

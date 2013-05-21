@@ -57,4 +57,4 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 # libbfd requires libdl and libz
 target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
 
-# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab list:
+# vim:set tabstop=8 softtabstop=8 shiftwidth=4 noexpandtab list:

@@ -295,4 +295,4 @@ asection *find_vma_section(bfd *binary_bfd, bfd_vma vma_to_locate) {
 	return section_iterator;
 }
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=8 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */

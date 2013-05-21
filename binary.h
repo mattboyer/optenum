@@ -25,4 +25,4 @@ asection *find_vma_section(bfd *, bfd_vma);
 bool is_valid_file(const char*);
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=8 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */

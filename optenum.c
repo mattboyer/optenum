@@ -191,4 +191,4 @@ FAIL:
 	return EXIT_FAILURE;
 }
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=8 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
