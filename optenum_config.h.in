@@ -1,0 +1,8 @@
+// Turn these CMake variables into #defines
+#define EXEC_NAME @EXEC_NAME@
+#define VERSION_MAJOR @VERSION_MAJOR@
+#define VERSION_MINOR @VERSION_MINOR@
+#define VERSION_CHANGESET @VERSION_CHANGESET@
+
+// Use these to determine whether a given parser is compiled in
+#define HAVE_GLIB @GLIB@
