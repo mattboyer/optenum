@@ -31,9 +31,9 @@ string(TOLOWER ${PROJECT_NAME} EXEC_NAME)
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 10)
 
-# Make the Hg revision part of the the version information baked
+# Make the Git revision part of the the version information baked
 # into optenum_config.h
-execute_process (	COMMAND hg heads --template {rev}
+execute_process (	COMMAND git log --format=%h -n1
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
 			OUTPUT_VARIABLE HG_REVISION
 		)

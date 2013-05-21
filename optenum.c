@@ -81,8 +81,8 @@ void print_parsers(struct option_parsing_function_list *head) {
 }
 
 void print_version() {
-	printf(stringify_constant(EXEC_NAME) " v%d.%02d.%d\n", VERSION_MAJOR,
-		VERSION_MINOR, VERSION_CHANGESET);
+	printf(stringify_constant(EXEC_NAME) " v%d.%02d.%s\n", VERSION_MAJOR,
+		VERSION_MINOR, stringify_constant(VERSION_CHANGESET));
 }
 
 void usage() {
