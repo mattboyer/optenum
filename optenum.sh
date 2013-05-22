@@ -26,12 +26,11 @@
 # SUCH DAMAGE.
 
 function option_complete {
-	#(( $# == 3 )) || return 1
-
 	command=${1}
 
 	stem=${2}
-	#typeset -a COMPREPLY
+	# TODO In future, handle the case where the previous token on the
+	# command line is an option that expects a mandatry argument
 	[[ ${stem} = -* ]] || return 124
 
 	[[ ${stem%-*} = - ]] && enum_opt="-2"
@@ -40,11 +39,13 @@ function option_complete {
 	index=0;
 	while read option; do 
 		[[ ${option} == ${stem}* ]] || continue
-		#echo $option
 		COMPREPLY[${index}]=${option}
 		index=$((1+$index))
 	done << _EOMAN
-		$(optenum ${enum_opt} $(which ${command}))
+		$(optenum ${enum_opt} $(which ${command} 2>/dev/null) 2>/dev/null)
 _EOMAN
 }
 
+complete -D -F option_complete -o default
+
+# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab list:
