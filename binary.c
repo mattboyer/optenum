@@ -279,17 +279,21 @@ void filter_section_for_call(bfd *binary_bfd, asection *code_section, struct opt
 				if (parser->function->short_option_parser) {
 					bfd_vma descriptor = parse_ring_for_call_arg(binary_bfd, instruction_ring, parser->function->short_option_descriptor_pos);
 
-					struct parsed_option_list *short_options = parser->function->short_option_parser(binary_bfd, descriptor);
-					debug("Short option list %016"PRIXPTR"\n", (uintptr_t) short_options);
-					concatenate_parsed_options(options, short_options);
+					if (descriptor) {
+						struct parsed_option_list *short_options = parser->function->short_option_parser(binary_bfd, descriptor);
+						debug("Short option list %016"PRIXPTR"\n", (uintptr_t) short_options);
+						concatenate_parsed_options(options, short_options);
+					}
 				}
 
 				if (parser->function->long_option_parser) {
 					bfd_vma descriptor = parse_ring_for_call_arg(binary_bfd, instruction_ring, parser->function->long_option_descriptor_pos);
-					struct parsed_option_list *long_options = parser->function->long_option_parser(binary_bfd, descriptor);
+					if (descriptor) {
+						struct parsed_option_list *long_options = parser->function->long_option_parser(binary_bfd, descriptor);
 
-					debug("Long option list %016"PRIXPTR"\n", (uintptr_t) long_options);
-					concatenate_parsed_options(options, long_options);
+						debug("Long option list %016"PRIXPTR"\n", (uintptr_t) long_options);
+						concatenate_parsed_options(options, long_options);
+					}
 				}
 			}
 		}
