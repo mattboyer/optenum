@@ -151,6 +151,10 @@ void concatenate_parsed_options(struct parsed_option_list **left, struct parsed_
 }
 
 void free_parsed_options(struct parsed_option_list *options) {
+
+	if (!options)
+		return;
+
 	while (options->prev)
 		options=options->prev;
 
@@ -164,6 +168,9 @@ void free_parsed_options(struct parsed_option_list *options) {
 }
 
 void display_options(const struct parsed_option_list *options, enum OPTION_TYPE type) {
+
+	if (!options)
+		return;
 
 	while (options->prev)
 		options=options->prev;
