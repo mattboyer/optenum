@@ -40,7 +40,8 @@ SUCH DAMAGE.
 
 bfd_vma parse_call_address(bfd*, char*);
 bool is_call(bfd*, struct disassembly_ring*);
-bfd_vma parse_ring_for_call_arg(bfd*, const struct disassembly_ring *, const unsigned int);
+bfd_vma parse_ring_for_call_arg(bfd*, const struct disassembly_ring *,
+	const unsigned int);
 
 #endif
 /* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
