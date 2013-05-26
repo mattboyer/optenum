@@ -106,7 +106,6 @@ struct parsed_option_list *iterate_long_opts(bfd *binary_bfd, const bfd_vma long
 		options_found = append_option(options_found, (const char*) &section_data[name_offset], (bool) (1==long_option->has_arg), TWO_DASH);
 
 
-
 		longopt_offset += sizeof(struct option);
 
 	}

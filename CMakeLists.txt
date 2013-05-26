@@ -35,9 +35,9 @@ set (VERSION_MINOR 10)
 # into optenum_config.h
 execute_process (	COMMAND git log --format=%h -n1
 			WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-			OUTPUT_VARIABLE HG_REVISION
+			OUTPUT_VARIABLE GIT_REVISION
 		)
-set (VERSION_CHANGESET ${HG_REVISION})
+set (VERSION_CHANGESET ${GIT_REVISION})
 
 configure_file ("${PROJECT_SOURCE_DIR}/optenum_config.h.in"
     "${PROJECT_BINARY_DIR}/optenum_config.h")
@@ -56,10 +56,15 @@ file(GLOB ${PROJECT_NAME}_SRCS RELATIVE ${PROJECT_SOURCE_DIR}
 	arch/*.c
 )
 
-find_library (GLIB "libglib-2.0.so")
-iF (GLIB)
+find_package (PkgConfig)
+pkg_check_modules (GLIB2 glib-2.0)
+
+iF (GLIB2_FOUND)
+	message(STATUS "Building parser for GLib's g_option_*")
+	include_directories (${GLIB2_INCLUDE_DIRS})
+
 	list( APPEND ${PROJECT_NAME}_SRCS parsers/glib.c)
-endiF (GLIB)
+endiF (GLIB2_FOUND)
 
 
 
@@ -84,4 +89,11 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 # libbfd requires libdl and libz
 target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
 
-# vim:set tabstop=8 softtabstop=8 shiftwidth=4 noexpandtab list:
+if (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
+	message (STATUS "Compiling a RELEASE build - enabling install rules")
+	install(TARGETS ${EXEC_NAME} RUNTIME DESTINATION "bin")
+else (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
+	message (WARNING "Install rules are only available for DEBUG builds.")
+endif (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
+
+# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab list:

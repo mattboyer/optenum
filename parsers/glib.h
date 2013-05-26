@@ -35,7 +35,9 @@ SUCH DAMAGE.
 #include "../binary.h"
 #include "../disassemble.h"
 
-struct parsed_option_list *g_option_magic(bfd *, const bfd_vma);
+#include <glib.h>
+
+struct parsed_option_list *parse_goption_main_entries(bfd *, const bfd_vma);
 
 #define glib_parsers\
-	{"g_option_context_parse", NULL, 0, g_option_magic, 0}, 
+	{"g_option_context_add_main_entries", NULL, 0, parse_goption_main_entries, 2}, 
