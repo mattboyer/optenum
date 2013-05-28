@@ -141,10 +141,18 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 
 			debug("Looking for a MOV into %s\n", dest_registers[arg_pos]);
 
-			if (0==strncmp(mov_dst, dest_registers[arg_pos], strlen(dest_registers[arg_pos]))) {
-				assert(0==strncmp(mov_src, (const char*) "$0x", 3));
-				option_descriptor = (bfd_vma) strtoll(&mov_src[3], NULL, 16);
-				info("Option descriptor at %016"PRIXPTR"\n", (uintptr_t) option_descriptor);
+			// We'll handle the fact RDX -> EDX -> DX refer to, essentially, the
+			// same register by matching on the last 2 characters of register
+			// names.
+			// TODO What of the upper/lower 8bit registers, eg. DH / DL?
+			if (0==strncmp(&mov_dst[strlen(mov_dst)-2], dest_registers[arg_pos], strlen(dest_registers[arg_pos]))) {
+
+				// Bail if the argument of index arg_pos isn't a static address
+				// in the memory space of the program
+				if (0==strncmp(mov_src, (const char*) "$0x", 3)) {
+					option_descriptor = (bfd_vma) strtoll(&mov_src[3], NULL, 16);
+					info("Option descriptor at %016"PRIXPTR"\n", (uintptr_t) option_descriptor);
+				}
 			}
 
 			free(mov_src);
