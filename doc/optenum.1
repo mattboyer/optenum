@@ -1,0 +1,39 @@
+.TH OPTENUM "1" "MAY 2013" Linux "User Manuals"
+.SH NAME
+optenum \- command line option enumerator for ELF executables
+.SH SYNOPSIS
+.B optenum
+[\fI-12lv\fR] <file>
+.SH DESCRIPTION
+.B optenum
+uses static analysis to extract the options accepted by a binary. 
+
+By default, unless \fB-1\fR or \fB-2\fR is passed, optenum will display the set of all command line options accepted by the target binary file.
+
+.SS "Exit status:"
+.TP
+0
+if options have been found,
+.TP
+1
+if no options have been found.
+
+.SH OPTIONS
+.IP -1
+Only show options that are prefixed by a single dash character ('-').
+.IP -2
+Only show options that are prefixed by two dash characters ('--').
+.IP -l
+Displays the set of option parsing function supported in the target binary.
+.IP -v
+Print the version number of optenum and exit.
+
+.SH LIMITATIONS
+.B optenum
+only supports x86_64 argument passing conventions at this time.
+.SH BUGS
+Yes
+.SH AUTHOR
+Matt Boyer <mboyer at sdf dot org>
+.SH "SEE ALSO"
+.BR objdump (1)
