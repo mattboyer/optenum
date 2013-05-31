@@ -96,18 +96,35 @@ struct parsed_option_list *iterate_long_opts(bfd *binary_bfd, const bfd_vma long
 
 		debug("struct option @ section offset %ld\t loaded into %016" PRIXPTR "\n", longopt_offset, (uintptr_t) long_option);
 
-		// XXX assume the option string lives in the same section. that's bullshit of course
-		// XXX Also, casting long_option-> which is a member of a struct in the local arch to a bfd_vma is super dodgy
-		size_t name_offset = ( (bfd_vma)long_option->name - longopt_section->vma);
+		// FIXME We're assuming that pointers hardcoded into the binary can
+		// safely be cast into bfd_vma, which is unsafe
 
+		// We can't assume member 'name' of the struct option will point to an
+		// area in the same section of the ELF binary as the struct option
+		// itself
+		bfd_byte *option_name_section_data = NULL;
+		asection *option_name_section = find_vma_section(binary_bfd, (bfd_vma) long_option->name);
+		debug("option name lives in section %s\n", option_name_section->name);
+		if (option_name_section==longopt_section) {
+			option_name_section_data = section_data;
+		} else {
+			size_t option_name_sec_size = bfd_get_section_size(option_name_section);
+			option_name_section_data = (bfd_byte *) xmalloc (option_name_sec_size);
+			bfd_get_section_contents(binary_bfd, option_name_section, option_name_section_data, 0, option_name_sec_size);
+		}
 
-		debug("option name @ %016" PRIXPTR ": %s\n", (uintptr_t) long_option->name, &section_data[name_offset]);
+		size_t name_offset = ( (bfd_vma)long_option->name - option_name_section->vma);
 
-		options_found = append_option(options_found, (const char*) &section_data[name_offset], (bool) (1==long_option->has_arg), TWO_DASH);
+		debug("option name @ %016" PRIXPTR ": %s\n", (uintptr_t) long_option->name, &option_name_section_data[name_offset]);
 
+		options_found = append_option(options_found, 
+			(const char*) &option_name_section_data[name_offset], 
+			(bool) (1==long_option->has_arg), TWO_DASH);
+
+		if (option_name_section != longopt_section)
+			free(option_name_section_data);
 
 		longopt_offset += sizeof(struct option);
-
 	}
 
 	debug("Last struct option in array at offset %ld vma %016" PRIXPTR "\n", longopt_offset, longopt_section->vma+longopt_offset);
