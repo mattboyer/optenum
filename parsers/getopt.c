@@ -94,6 +94,10 @@ struct parsed_option_list *iterate_long_opts(bfd *binary_bfd, const bfd_vma long
 
 		struct option *long_option = (struct option*) &section_data[longopt_offset];
 
+		if (NULL==long_option->name)
+			break;
+
+
 		debug("struct option @ section offset %ld\t loaded into %016" PRIXPTR "\n", longopt_offset, (uintptr_t) long_option);
 
 		// FIXME We're assuming that pointers hardcoded into the binary can
