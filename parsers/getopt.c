@@ -108,6 +108,8 @@ struct parsed_option_list *iterate_long_opts(bfd *binary_bfd, const bfd_vma long
 		// itself
 		bfd_byte *option_name_section_data = NULL;
 		asection *option_name_section = find_vma_section(binary_bfd, (bfd_vma) long_option->name);
+		if (!option_name_section)
+			break;
 		debug("option name lives in section %s\n", option_name_section->name);
 		if (option_name_section==longopt_section) {
 			option_name_section_data = section_data;
