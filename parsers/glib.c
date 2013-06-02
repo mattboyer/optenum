@@ -49,9 +49,26 @@ struct parsed_option_list *parse_goption_main_entries(bfd *binary_bfd, const bfd
 
 		GOptionEntry *glib_option = (GOptionEntry*) &section_data[option_entry_offset];
 		info("GOptionEntry at %016"PRIXPTR"\n", (uintptr_t) glib_option);
-		size_t long_option_offset = ( (bfd_vma) glib_option->long_name - option_entry_section->vma);
-		info("long %s\n", &section_data[long_option_offset]);
-		options_found = append_option(options_found, (const char*) &section_data[long_option_offset], (bool) false, TWO_DASH);
+
+		bfd_byte *long_name_section_data = NULL;
+		asection *long_name_section = find_vma_section(binary_bfd, (bfd_vma) glib_option->long_name);
+		if (!long_name_section)
+			break;
+		debug("option name lives in section %s\n", long_name_section->name);
+		if (long_name_section == option_entry_section) {
+			long_name_section_data = section_data;
+		} else {
+			size_t long_name_sec_size = bfd_get_section_size(long_name_section);
+			long_name_section_data = (bfd_byte *) xmalloc (long_name_sec_size);
+			bfd_get_section_contents(binary_bfd, long_name_section, long_name_section_data, 0, long_name_sec_size);
+		}
+		size_t long_option_offset = (glib_option->long_name - long_name_section->vma);
+
+		info("long name %s\n", &long_name_section_data[long_option_offset]);
+		options_found = append_option(options_found, (const char*) &long_name_section_data[long_option_offset], (bool) false, TWO_DASH);
+
+		if ((char) 0x0 != glib_option->short_name)
+			options_found = append_option(options_found, (const char*) &glib_option->short_name, (bool) false, ONE_DASH);
 
 		option_entry_offset += sizeof(GOptionEntry);
 	}
@@ -60,3 +77,5 @@ struct parsed_option_list *parse_goption_main_entries(bfd *binary_bfd, const bfd
 
 	return options_found;
 }
+
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
