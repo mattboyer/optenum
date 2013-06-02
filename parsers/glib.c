@@ -62,7 +62,7 @@ struct parsed_option_list *parse_goption_main_entries(bfd *binary_bfd, const bfd
 			long_name_section_data = (bfd_byte *) xmalloc (long_name_sec_size);
 			bfd_get_section_contents(binary_bfd, long_name_section, long_name_section_data, 0, long_name_sec_size);
 		}
-		size_t long_option_offset = (glib_option->long_name - long_name_section->vma);
+		size_t long_option_offset = ((bfd_vma) glib_option->long_name - long_name_section->vma);
 
 		info("long name %s\n", &long_name_section_data[long_option_offset]);
 		options_found = append_option(options_found, (const char*) &long_name_section_data[long_option_offset], (bool) false, TWO_DASH);
