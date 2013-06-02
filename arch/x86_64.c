@@ -121,7 +121,7 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 
 		// If we go so far backward that we see another function call, the
 		// search for argument passing instructions must be called off
-		if (x86_64__is_call((struct disassembly_ring*) instruction))
+		if (instruction != first_seen && x86_64__is_call((struct disassembly_ring*) instruction))
 			break;
 
 		// Argument passing (at least for pointers) is done on x86_64 by
