@@ -106,6 +106,8 @@ int main(int argc, char** argv) {
 
 	debug("Supported function list starts at %016"PRIXPTR"\n", (uintptr_t) supported_functions);
 
+	break_on_first = false;
+
 	/* Parse options and argument */
 	enum OPTION_TYPE parsed_option_display_filter = (enum OPTION_TYPE) NO_TYPE;
 	int option=0;
@@ -129,12 +131,27 @@ int main(int argc, char** argv) {
 				break;
 #endif
 			case '1':
+				if (NO_TYPE!=parsed_option_display_filter) {
+					destroy_parser_list(supported_functions);
+					error("-1 and -2 are mutually exclusive. Pick one.");
+					return EXIT_SUCCESS;
+				}
 				parsed_option_display_filter = ONE_DASH;
 				break;
 
 			case '2':
+				if (NO_TYPE!=parsed_option_display_filter) {
+					destroy_parser_list(supported_functions);
+					error("-1 and -2 are mutually exclusive. Pick one.");
+					return EXIT_SUCCESS;
+				}
 				parsed_option_display_filter = TWO_DASH;
 				break;
+
+			case 'b':
+				break_on_first = true;
+				break;
+
 			case '?':
 				destroy_parser_list(supported_functions);
 				usage();
@@ -151,11 +168,7 @@ int main(int argc, char** argv) {
 		return EXIT_FAILURE;
 	}
 
-
-	/////////////////////////////
 	bfd_init();
-
-
 	debug("Attempting to open %s\n", argv[optind]);
 	if (!is_valid_file(argv[optind])) {
 		destroy_parser_list(supported_functions);
@@ -198,6 +211,7 @@ int main(int argc, char** argv) {
 
 			info("Looking for calls to:\t%s:\t%016"PRIXPTR"\n", parser_iter->function->name, parser_iter->reloc);
 			parser_iter->call_address = get_reloc_call_address(binary_bfd, parser_iter->reloc);
+
 			// This will parse all code sections for calls to this parser
 			filter_code_sections(binary_bfd, parser_iter, &options);
 next_match:

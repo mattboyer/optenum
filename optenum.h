@@ -38,7 +38,7 @@ SUCH DAMAGE.
 #include <stdlib.h>
 
 
-#define _SHORTOPTS "12lv"
+#define _SHORTOPTS "12blv"
 
 #ifdef DEBUG
 #define SHORTOPTS _SHORTOPTS "d"

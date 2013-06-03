@@ -36,6 +36,7 @@ function option_complete {
 	[[ ${stem%-*} = - ]] && enum_opt="-2"
 	[[ ${stem%-*} = "" ]] && enum_opt="-1"
 
+	enum_opt="${enum_opt} -b"
 	index=0;
 	while read option; do 
 		[[ ${option} == ${stem}* ]] || continue

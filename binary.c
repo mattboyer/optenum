@@ -30,7 +30,7 @@ SUCH DAMAGE.
 /* Operations performed on the binary go in here */
 #include "binary.h"
 
-static const char* skip_sections[] = {".init", ".fini", NULL};
+static const char* skip_sections[] = {".init", ".fini", ".plt", NULL};
 
 bool is_valid_file(const char* file_name) {
 	assert(file_name);
@@ -84,7 +84,7 @@ size_t parse_binary_dynamic_symbols(bfd *binary_bfd, asymbol ***storage_address)
 	}
 #endif
 
-	//XXX Freeing symbol_storage will have to be done by the caller!!!
+	// Freeing symbol_storage will have to be done by the caller!!!
 	*storage_address = symbol_storage;
 	return num_symbols;
 }
@@ -102,7 +102,6 @@ unsigned int parse_dynamic_relocs(bfd *binary_bfd, asymbol **symbols, struct opt
 	relocation_storage_length = bfd_get_dynamic_reloc_upper_bound(binary_bfd);
 	info("%d bytes needed to store relocation information for this binary\n", relocation_storage_length);
 
-
 	// So it's looking like the array of arelent is allocated during the
 	// call whereas the symbols have to be allocated beforehand?! Would be
 	// nice to have some documentation, eh?
@@ -113,7 +112,7 @@ unsigned int parse_dynamic_relocs(bfd *binary_bfd, asymbol **symbols, struct opt
 	num_relocs = bfd_canonicalize_dynamic_reloc(binary_bfd, relocation_storage, symbols);
 	info("Copied %d relocs\n", num_relocs);
 
-	// Right... this spike is getting interesting now... parse the relocation entries
+	// Parse the relocation entries
 	for(rel_idx = 0; rel_idx < num_relocs; ++rel_idx) {
 		asymbol* relocated_symbol = *relocation_storage[rel_idx]->sym_ptr_ptr;
 
@@ -151,7 +150,6 @@ bfd_vma get_reloc_call_address(bfd *binary_bfd, bfd_vma reloc) {
 	assert(reloc_section);
 
 	unsigned long section_offset = reloc - reloc_section->vma;
-	//debug("Section \"%s\"'s vma is %08" PRIXPTR " offset of %08" PRIXPTR "\n", reloc_section->name, (uintptr_t) reloc_section->vma, (uintptr_t) section_offset);
 
 	// Read the whole section, even though we're only going to copy one
 	// teeny-tiny bfd_vma from it
@@ -295,6 +293,10 @@ void filter_section_for_call(bfd *binary_bfd, asection *code_section, struct opt
 						concatenate_parsed_options(options, long_options);
 					}
 				}
+
+				// Break after first successful match if required
+				if (break_on_first && NULL != *options)
+					break;
 			}
 		}
 

@@ -3,7 +3,7 @@
 optenum \- command line option enumerator for ELF executables
 .SH SYNOPSIS
 .B optenum
-[\fI-12lv\fR] <file>
+[\fI-12blv\fR] <file>
 .SH DESCRIPTION
 .B optenum
 uses static analysis to extract the options accepted by a binary. 
@@ -23,8 +23,10 @@ if no options have been found.
 Only show options that are prefixed by a single dash character ('-').
 .IP -2
 Only show options that are prefixed by two dash characters ('--').
+.IP -b
+This option will interrupt the search for command line options after the first successful match. In many cases, using \fB-b\fR causes optenum to terminate much faster as the first call to an option parsing function is often found early in a binary's code section(s), but the set of options presented may be incomplete as a result.
 .IP -l
-Displays the set of option parsing function supported in the target binary.
+Display the set of option parsing function supported in the target binary and exit.
 .IP -v
 Print the version number of optenum and exit.
 

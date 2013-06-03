@@ -42,6 +42,7 @@ SUCH DAMAGE.
 #include "disassemble.h"
 #include "arch.h"
 
+bool break_on_first;
 
 // Prototypes go here
 size_t parse_binary_dynamic_symbols(bfd *, asymbol ***);
