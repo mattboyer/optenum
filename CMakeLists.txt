@@ -89,6 +89,11 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 # libbfd requires libdl and libz
 target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
 
+if (NOT DEFINED ${CMAKE_BUILD_TYPE})
+	message (STATUS "Build type not specified - defaulting to RELEASE build")
+	set (CMAKE_BUILD_TYPE "RELEASE")
+endif (NOT DEFINED ${CMAKE_BUILD_TYPE})
+
 if (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 	message (STATUS "Compiling a RELEASE build - enabling install rules")
 	install(TARGETS ${EXEC_NAME} RUNTIME DESTINATION "bin")
