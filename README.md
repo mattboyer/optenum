@@ -6,7 +6,38 @@ optenum(1) is a command-line option enumerator for ELF executables.
 
 optenum(1) uses static analysis to extract the options accepted by a binary and lets you use [bash](http://www.gnu.org/software/bash/)'s autocompletion with options.
 
-`<space> <dash> <TAB> <TAB>` - it's *magic*!
+`<space> - <TAB> <TAB>` - it's *magic*!
+
+##Installing optenum
+
+Building optenum is quick and easy. Download the source into a staging directory, run `cmake` then `make install`
+
+```shell
+$ git clone git://github.com/mattboyer/optenum.git
+$ cd optenum/
+$ cmake -DCMAKE_INSTALL_PREFIX:PATH=~/.local .
+$ make install
+```
+
+**Note** The above will install optenum under the current user's home directory. For a system-wide install, replace the cmake invocation above with `cmake .`. This will cause optenum to be installed under `/usr/local/`, which will require elevated privileges.
+
+All that's left to do is make sure the completion function is sourced and registered by your shell. You may want to add the following to your `~/.bashrc`:
+
+```shell
+. ~/.local/share/optenum/optenum.sh
+```
+
+##About
+
+optenum(1) uses `libbfd` from the [GNU binutils](http://www.gnu.org/software/binutils/) to parse the dynamic symbols used by a binary executable and disassemble its code.
+
+When it finds a call to one of the supported option-parsing functions above, optenum will attempt to reconstitute the arguments passed as part of the call and, in the even the argument(s) that describes valid options has successfully been retrieved and points to a chunk of data hardcoded in the binary, finally parses it and exposes options to the user.
+
+optenum(1) **never** executes foreign code and doesn't rely on any particular behaviour in the target binary. No usage message? No problem!
+
+There are several moving parts and optenum operates on a best-effort basis. When optenum can't retrieve options, it will try to fail gracefully and fail fast.
+
+##Compatibility
 
 optenum(1) extracts options from binary executables by relying on the assumption that the task of defining valid command line options is done through a call to one of the following supported functions:
 
@@ -19,13 +50,5 @@ optenum(1) extracts options from binary executables by relying on the assumption
 <tr><td><tt>g_option_context_add_main_entries</tt></td><td>Glib</td><td>Gimp, Xchat,...</td></tr>
 </tbody>
 </table>
-
-optenum(1) uses `libbfd` from the [GNU binutils](http://www.gnu.org/software/binutils/) to parse the dynamic symbols used by a binary executable and disassemble its code.
-
-When it finds a call to one of the supported option-parsing functions above, optenum will attempt to reconstitute the arguments passed as part of the call and, in the even the argument(s) that describes valid options has successfully been retrieved and points to a chunk of data hardcoded in the binary, finally parses it and exposes options to the user.
-
-optenum(1) **never** executes foreign code and doesn't rely on any particular behaviour in the target binary. No usage message? No problem!
-
-There are several moving parts and optenum operates on a best-effort basis. When optenum can't retrieve options, it will try to fail gracefully and fail fast.
 
 optenum(1) only supports `x86_64` argument passing conventions at this time. Support for 32-bit `i386` binaries is planned with other architectures a possibility.
