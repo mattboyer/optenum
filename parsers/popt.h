@@ -27,50 +27,23 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#ifndef __TABBER_H
-#define __TABBER_H
+#include "../debug.h" //needed for debug stuff
 
+#include "../binutils.h"
 
-#include "binutils.h"
-#include "debug.h"
-#include "binary.h"
+// Provides binary access functions
+#include "../binary.h"
+#include "../disassemble.h"
 
-#include <stdlib.h>
+#include <strings.h>
 
+#include <popt.h>
 
-#define _SHORTOPTS "12blv"
+static const struct poptOption last_option = POPT_TABLEEND;
 
-#ifdef DEBUG
-#define SHORTOPTS _SHORTOPTS "d"
-#else
-#define SHORTOPTS _SHORTOPTS
-#endif
+struct parsed_option_list *parse_popt(bfd *, const bfd_vma);
 
-#include "disassemble.h"
+#define popt_parsers\
+	{"poptGetContext", NULL, 0, parse_popt, 4}, 
 
-// Below this line, we'll be including header files for invidal argument
-// parsing modules
-#include "parsers/getopt.h"
-#ifdef HAVE_GLIB
-#include "parsers/glib.h"
-#endif
-#ifdef HAVE_POPT
-#include "parsers/popt.h"
-#endif
-
-struct option_parsing_function parsers[]={
-	getopt_parsers
-#ifdef HAVE_GLIB
-	glib_parsers
-#endif
-#ifdef HAVE_POPT
-	popt_parsers
-#endif
-};
-
-
-void print_version();
-void usage();
-
-#endif
 /* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */

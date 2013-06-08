@@ -48,6 +48,7 @@ optenum(1) extracts options from binary executables by relying on the assumption
 <tr><td><tt>getopt_long</tt></td></tr>
 <tr><td><tt>getopt_long_only</tt></td></tr>
 <tr><td><tt>g_option_context_add_main_entries</tt></td><td>Glib</td><td>Gimp, Xchat,...</td></tr>
+<tr><td><tt>poptGetContext</tt></td><td>popt</td><td>Samba utils, logrotate, cryptsetup...</td></tr>
 </tbody>
 </table>
 

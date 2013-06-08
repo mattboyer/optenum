@@ -59,12 +59,20 @@ file(GLOB ${PROJECT_NAME}_SRCS RELATIVE ${PROJECT_SOURCE_DIR}
 find_package (PkgConfig)
 pkg_check_modules (GLIB2 glib-2.0)
 
-iF (GLIB2_FOUND)
+if (GLIB2_FOUND)
 	message(STATUS "Building parser for GLib's g_option_*")
 	include_directories (${GLIB2_INCLUDE_DIRS})
 
 	list( APPEND ${PROJECT_NAME}_SRCS parsers/glib.c)
-endiF (GLIB2_FOUND)
+endif (GLIB2_FOUND)
+
+pkg_check_modules (POPT popt)
+if (POPT_FOUND)
+	message(STATUS "Building parser for popt's poptGetContext")
+	include_directories (${POPT_INCLUDE_DIRS})
+
+	list( APPEND ${PROJECT_NAME}_SRCS parsers/popt.c)
+endif (POPT_FOUND)
 
 
 
@@ -89,10 +97,11 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 # libbfd requires libdl and libz
 target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
 
-if (NOT DEFINED ${CMAKE_BUILD_TYPE})
+
+if (NOT CMAKE_BUILD_TYPE)
 	message (STATUS "Build type not specified - defaulting to RELEASE build")
 	set (CMAKE_BUILD_TYPE "RELEASE")
-endif (NOT DEFINED ${CMAKE_BUILD_TYPE})
+endif (NOT CMAKE_BUILD_TYPE)
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 	message (STATUS "Compiling a RELEASE build - enabling install rules")

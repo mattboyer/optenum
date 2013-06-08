@@ -6,3 +6,4 @@
 
 // Use these to determine whether a given parser is compiled in
 #define HAVE_GLIB @GLIB@
+#define HAVE_POPT @POPT@
