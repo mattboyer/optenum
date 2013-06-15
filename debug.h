@@ -67,29 +67,70 @@ bool debug;
 #define info(...) \
 	debug_output(blue("Info "), ##__VA_ARGS__)
 
-
-#define _error(format, ...) \
+#define _error_0()
+#define _error_1(format) \
 	if (0!=errno) {\
-		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format, __func__, ##__VA_ARGS__); \
+		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format, __func__); \
 		perror(" "); \
 	} else { \
-		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format "\n", __func__, ##__VA_ARGS__); \
+		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format "\n", __func__); \
 	}
 
-#define error(...) _error(__VA_ARGS__)
+#define _error_2(format, arg1) \
+	if (0!=errno) {\
+		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format, __func__, arg1); \
+		perror(" "); \
+	} else { \
+		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format "\n", __func__, arg1); \
+	}
+
+#define _error_3(format, arg1, arg2) \
+	if (0!=errno) {\
+		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format, __func__, arg1, arg2); \
+		perror(" "); \
+	} else { \
+		fprintf(stderr, red("Error ") white("[%s:" stringify_constant(__LINE__) "] ") format "\n", __func__, arg1, arg2); \
+	}
 
 #else
 #define debug(...) false
 #define info(...) false
 
-#define error(format, ...) \
+#define _error_0()
+#define _error_1(format) \
 	if (0!=errno) {\
-		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format, ##__VA_ARGS__); \
+		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format); \
 		perror(" "); \
 	} else { \
-		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format "\n", ##__VA_ARGS__); \
+		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format "\n"); \
 	}
+
+#define _error_2(format, arg1) \
+	if (0!=errno) {\
+		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format, arg1); \
+		perror(" "); \
+	} else { \
+		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format "\n", arg1); \
+	}
+
+#define _error_3(format, arg1, arg2) \
+	if (0!=errno) {\
+		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format, arg1, arg2); \
+		perror(" "); \
+	} else { \
+		fprintf(stderr, stringify_constant(EXEC_NAME) ": " format "\n", arg1, arg2); \
+	}
+
 #endif
+
+#define _error_x(x,A,B,C,FUNC, ...)  FUNC
+
+#define error(...) _error_x(,##__VA_ARGS__,\
+	  _error_3(__VA_ARGS__),\
+	  _error_2(__VA_ARGS__),\
+	  _error_1(__VA_ARGS__),\
+	  _error_0(__VA_ARGS__),\
+) 
 
 #endif
 /* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
