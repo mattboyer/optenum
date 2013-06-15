@@ -37,7 +37,7 @@ bool is_valid_file(const char* file_name) {
 	struct stat file_props;
 
 
-	if (0!=access(file_name, F_OK)) {
+	if (0!=access(file_name, R_OK)) {
 		error("Couldn't access(2) %s", file_name);
 		return false;
 	}
