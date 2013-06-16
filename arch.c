@@ -85,7 +85,6 @@ http://stackoverflow.com/a/8814003
                                          ) 
 
 
-
 #define ARCH_DISPATCH(func_name, return_type, ...) \
 	return_type func_name(bfd *target_binary, TYPES_NAMES(__VA_ARGS__)) {	\
 		\
@@ -114,7 +113,7 @@ http://stackoverflow.com/a/8814003
 		strcpy(arch_func_name, prefix);\
 		strcat(arch_func_name, #func_name);\
 		info("Attempting to resolve %s\n", arch_func_name);\
-		arch_func_ptr = dlsym(self_dl_handle, arch_func_name);	\
+		*(void**) (&arch_func_ptr) = dlsym(self_dl_handle, arch_func_name);	\
 		if (!arch_func_ptr) {	\
 			error("dlsym() failed: %s", dlerror());	\
 		}	\
