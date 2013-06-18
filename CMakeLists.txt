@@ -57,21 +57,42 @@ file(GLOB ${PROJECT_NAME}_SRCS RELATIVE ${PROJECT_SOURCE_DIR}
 )
 
 find_package (PkgConfig)
+
+# Some distros have separate '*-dev' packages for header files, dev docs and
+# the like. Consequently, a pkc-config .pc file may be found on the system for
+# eg. popt without the requisite header files actually being present.
 pkg_check_modules (GLIB2 glib-2.0)
-
 if (GLIB2_FOUND)
-	message(STATUS "Building parser for GLib's g_option_*")
-	include_directories (${GLIB2_INCLUDE_DIRS})
-
-	list( APPEND ${PROJECT_NAME}_SRCS parsers/glib.c)
+	find_file(GLIB2_HEADER "glib.h" ${GLIB2_INCLUDE_DIRS})
+	if (GLIB2_HEADER)
+		message(STATUS "Building parser for GLib's g_option_* - header"
+			" at ${GLIB2_HEADER}")
+		include_directories (${GLIB2_INCLUDE_DIRS})
+		list (APPEND ${PROJECT_NAME}_SRCS parsers/glib.c)
+		file (APPEND "${PROJECT_BINARY_DIR}/optenum_config.h"
+			"#define HAVE_GLIB2\n"
+		)
+	else (GLIB2_HEADER)
+		message(WARNING "glib2 is installed but its header files"
+			" couldn't be found")
+	endif (GLIB2_HEADER)
 endif (GLIB2_FOUND)
 
 pkg_check_modules (POPT popt)
 if (POPT_FOUND)
-	message(STATUS "Building parser for popt's poptGetContext")
-	include_directories (${POPT_INCLUDE_DIRS})
-
-	list( APPEND ${PROJECT_NAME}_SRCS parsers/popt.c)
+	find_file(POPT_HEADER "popt.h")
+	if (POPT_HEADER)
+		message(STATUS "Building parser for popt's poptGetContext - "
+			"header at ${POPT_HEADER}")
+		include_directories (${POPT_INCLUDE_DIRS})
+		list (APPEND ${PROJECT_NAME}_SRCS parsers/popt.c)
+		file (APPEND "${PROJECT_BINARY_DIR}/optenum_config.h"
+			"#define HAVE_POPT\n"
+		)
+	else (POPT_HEADER)
+		message(WARNING "popt is installed but its header files"
+			" couldn't be found")
+	endif (POPT_HEADER)
 endif (POPT_FOUND)
 
 
@@ -91,7 +112,9 @@ add_executable (${EXEC_NAME} ${${PROJECT_NAME}_SRCS})
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	message (STATUS "GCC detected - making compiler pedantic")
-	set_target_properties (${EXEC_NAME} PROPERTIES COMPILE_FLAGS "-std=c99 -Wall -pedantic")
+	set_target_properties (${EXEC_NAME} PROPERTIES COMPILE_FLAGS
+		"-std=c99 -Wall -pedantic"
+	)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # libbfd requires libdl and libz
