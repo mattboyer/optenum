@@ -87,17 +87,77 @@ START_TEST (test_append_three)
 }
 END_TEST
 
+START_TEST (test_concatenate_to_empty)
+{
+	struct parsed_option_list *right = NULL;
+	right = append_option(right, "foo", true, ONE_DASH);
+	right = append_option(right, "bar", true, ONE_DASH);
+	right = append_option(right, "baz", false, TWO_DASH);
+
+	ck_assert_int_gt(right, NULL);
+
+	struct parsed_option_list *left = NULL;
+	concatenate_parsed_options(&left, right);
+
+	ck_assert_int_gt(left, NULL);
+	ck_assert_str_eq(left->option->name, "foo");
+	ck_assert_str_eq(left->next->option->name, "bar");
+	ck_assert_str_eq(left->next->next->option->name, "baz");
+	ck_assert_int_eq(left->next->next->next, NULL);
+	ck_assert_int_eq(left->prev, NULL);
+}
+END_TEST
+
+START_TEST (test_concatenate_to_nonempty)
+{
+	struct parsed_option_list *right = NULL;
+	right = append_option(right, "foo", true, ONE_DASH);
+	right = append_option(right, "bar", true, ONE_DASH);
+	right = append_option(right, "baz", false, TWO_DASH);
+
+	ck_assert_int_gt(right, NULL);
+
+	struct parsed_option_list *left = NULL;
+	left = append_option(left, "alpha", true, ONE_DASH);
+	left = append_option(left, "bravo", true, ONE_DASH);
+	left = append_option(left, "charlie", false, TWO_DASH);
+
+	struct parsed_option_list *old_left = left;
+	concatenate_parsed_options(&left, right);
+	// That's really weird. It would be better to change the left list to be
+	// the head of the concatenated list
+	ck_assert_int_eq(left, old_left);
+
+	ck_assert_int_gt(left, NULL);
+	ck_assert_str_eq(left->option->name, "charlie");
+
+	ck_assert_str_eq(left->prev->option->name, "bravo");
+	ck_assert_str_eq(left->prev->prev->option->name, "alpha");
+
+	ck_assert_str_eq(left->next->option->name, "foo");
+	ck_assert_str_eq(left->next->next->option->name, "bar");
+	ck_assert_str_eq(left->next->next->next->option->name, "baz");
+
+	ck_assert_int_eq(left->next->next->next->next, NULL);
+	ck_assert_int_eq(left->prev->prev->prev, NULL);
+}
+END_TEST
 
 Suite *arch_suite (void) {
 	Suite *s = suite_create ("Options");
 
-	/* Core test case */
-	TCase *tc_core = tcase_create ("Core");
+	TCase *tc_core = tcase_create ("Appending");
 	tcase_add_checked_fixture (tc_core, setup, teardown);
 	tcase_add_test (tc_core, test_append_to_empty);
 	tcase_add_test (tc_core, test_append_two);
 	tcase_add_test (tc_core, test_append_three);
 	suite_add_tcase (s, tc_core);
+
+	TCase *tc_append = tcase_create ("Concatenating");
+	tcase_add_checked_fixture (tc_core, setup, teardown);
+	tcase_add_test (tc_core, test_concatenate_to_empty);
+	tcase_add_test (tc_core, test_concatenate_to_nonempty);
+	suite_add_tcase (s, tc_append);
 
 	return s;
 }
