@@ -1,0 +1,175 @@
+#include <stdlib.h>
+#include <check.h>
+#include "../disassemble.c"
+
+void setup (void) {
+	return;
+}
+
+void teardown (void) {
+	return;
+}
+
+START_TEST (test_append_to_empty)
+{
+	struct parsed_option_list *empty = NULL;
+	ck_assert_int_eq(empty, NULL);
+	empty = append_option(empty, "foo", true, ONE_DASH);
+	ck_assert_int_gt(empty, NULL);
+	ck_assert_int_eq(empty->prev, NULL);
+	ck_assert_int_eq(empty->next, NULL);
+	ck_assert_int_gt(empty->option, NULL);
+
+	ck_assert_str_eq(empty->option->name, "foo");
+	ck_assert_int_eq(empty->option->description, NULL);
+	ck_assert_int_eq(empty->option->takes_argument, true);
+	ck_assert_int_eq(empty->option->type, ONE_DASH);
+}
+END_TEST
+
+START_TEST (test_append_two)
+{
+	struct parsed_option_list *options = NULL;
+	options = append_option(options, "foo", true, ONE_DASH);
+
+	struct parsed_option_list *option_one= options;
+	options = append_option(options, "bar", false, TWO_DASH);
+
+	ck_assert_int_gt(options, NULL);
+	ck_assert_int_eq(options->prev, option_one);
+	ck_assert_int_eq(options->next, NULL);
+	ck_assert_int_gt(options->option, NULL);
+
+	ck_assert_str_eq(options->option->name, "bar");
+	ck_assert_int_eq(options->option->description, NULL);
+	ck_assert_int_eq(options->option->takes_argument, false);
+	ck_assert_int_eq(options->option->type, TWO_DASH);
+
+	ck_assert_str_eq(options->prev->option->name, "foo");
+	ck_assert_int_eq(options->prev->option->description, NULL);
+	ck_assert_int_eq(options->prev->option->takes_argument, true);
+	ck_assert_int_eq(options->prev->option->type, ONE_DASH);
+	ck_assert_int_eq(options->prev->next, options);
+	ck_assert_int_eq(options->prev->prev, NULL);
+}
+END_TEST
+
+START_TEST (test_append_three)
+{
+	struct parsed_option_list *options = NULL;
+	options = append_option(options, "foo", true, ONE_DASH);
+
+	struct parsed_option_list *option_one= options;
+	options = append_option(options, "bar", false, TWO_DASH);
+	struct parsed_option_list *option_two= options;
+	options = append_option(options, "baz", true, NO_DASH);
+
+	ck_assert_int_gt(options, NULL);
+
+	ck_assert_int_eq(options->prev, option_two);
+	ck_assert_int_eq(options->next, NULL);
+	ck_assert_int_eq(options->prev->next, options);
+	ck_assert_int_eq(options->prev->prev, option_one);
+	ck_assert_int_eq(options->prev->prev->next, option_two);
+	ck_assert_int_eq(options->prev->prev->next->next, options);
+	ck_assert_int_eq(options->prev->prev->prev, NULL);
+
+	ck_assert_str_eq(options->option->name, "baz");
+	ck_assert_int_eq(options->option->description, NULL);
+	ck_assert_int_eq(options->option->takes_argument, true);
+	ck_assert_int_eq(options->option->type, NO_DASH);
+
+	ck_assert_str_eq(options->prev->option->name, "bar");
+	ck_assert_int_eq(options->prev->option->description, NULL);
+	ck_assert_int_eq(options->prev->option->takes_argument, false);
+	ck_assert_int_eq(options->prev->option->type, TWO_DASH);
+
+}
+END_TEST
+
+START_TEST (test_concatenate_to_empty)
+{
+	struct parsed_option_list *right = NULL;
+	right = append_option(right, "foo", true, ONE_DASH);
+	right = append_option(right, "bar", true, ONE_DASH);
+	right = append_option(right, "baz", false, TWO_DASH);
+
+	ck_assert_int_gt(right, NULL);
+
+	struct parsed_option_list *left = NULL;
+	concatenate_parsed_options(&left, right);
+
+	ck_assert_int_gt(left, NULL);
+	ck_assert_str_eq(left->option->name, "foo");
+	ck_assert_str_eq(left->next->option->name, "bar");
+	ck_assert_str_eq(left->next->next->option->name, "baz");
+	ck_assert_int_eq(left->next->next->next, NULL);
+	ck_assert_int_eq(left->prev, NULL);
+}
+END_TEST
+
+START_TEST (test_concatenate_to_nonempty)
+{
+	struct parsed_option_list *right = NULL;
+	right = append_option(right, "foo", true, ONE_DASH);
+	right = append_option(right, "bar", true, ONE_DASH);
+	right = append_option(right, "baz", false, TWO_DASH);
+
+	ck_assert_int_gt(right, NULL);
+
+	struct parsed_option_list *left = NULL;
+	left = append_option(left, "alpha", true, ONE_DASH);
+	left = append_option(left, "bravo", true, ONE_DASH);
+	left = append_option(left, "charlie", false, TWO_DASH);
+
+	struct parsed_option_list *old_left = left;
+	concatenate_parsed_options(&left, right);
+	// That's really weird. It would be better to change the left list to be
+	// the head of the concatenated list
+	ck_assert_int_eq(left, old_left);
+
+	ck_assert_int_gt(left, NULL);
+	ck_assert_str_eq(left->option->name, "charlie");
+
+	ck_assert_str_eq(left->prev->option->name, "bravo");
+	ck_assert_str_eq(left->prev->prev->option->name, "alpha");
+
+	ck_assert_str_eq(left->next->option->name, "foo");
+	ck_assert_str_eq(left->next->next->option->name, "bar");
+	ck_assert_str_eq(left->next->next->next->option->name, "baz");
+
+	ck_assert_int_eq(left->next->next->next->next, NULL);
+	ck_assert_int_eq(left->prev->prev->prev, NULL);
+}
+END_TEST
+
+Suite *arch_suite (void) {
+	Suite *s = suite_create ("Options");
+
+	TCase *tc_core = tcase_create ("Appending");
+	tcase_add_checked_fixture (tc_core, setup, teardown);
+	tcase_add_test (tc_core, test_append_to_empty);
+	tcase_add_test (tc_core, test_append_two);
+	tcase_add_test (tc_core, test_append_three);
+	suite_add_tcase (s, tc_core);
+
+	TCase *tc_append = tcase_create ("Concatenating");
+	tcase_add_checked_fixture (tc_core, setup, teardown);
+	tcase_add_test (tc_core, test_concatenate_to_empty);
+	tcase_add_test (tc_core, test_concatenate_to_nonempty);
+	suite_add_tcase (s, tc_append);
+
+	return s;
+}
+
+int main (void) {
+	int number_failed;
+	Suite *s = arch_suite();
+	SRunner *sr = srunner_create (s);
+	srunner_run_all (sr, CK_NORMAL);
+	number_failed = srunner_ntests_failed (sr);
+	srunner_free (sr);
+	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
