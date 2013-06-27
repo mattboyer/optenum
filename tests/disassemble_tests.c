@@ -143,6 +143,34 @@ START_TEST (test_concatenate_to_nonempty)
 }
 END_TEST
 
+
+START_TEST (test_free_options_appended)
+{
+	struct parsed_option_list *options = NULL;
+	options = append_option(options, "foo", true, ONE_DASH);
+
+	struct parsed_option_list *option_one= options;
+	options = append_option(options, "bar", false, TWO_DASH);
+	struct parsed_option_list *option_two= options;
+	options = append_option(options, "baz", true, NO_DASH);
+
+	ck_assert_int_gt(options, NULL);
+	ck_assert_int_eq(options->prev, option_two);
+	ck_assert_str_eq(options->prev->prev, option_one);
+
+	ck_assert_int_gt(options->option->name, NULL);
+	ck_assert_int_gt(options->prev->option->name, NULL);
+	ck_assert_int_gt(options->prev->prev->option->name, NULL);
+
+	free_parsed_options(options);
+	ck_assert_int_gt(options, NULL);
+	ck_assert_int_eq(options->prev, option_two);
+	ck_assert_str_eq(options->prev->prev, option_one);
+	// How can we assert that the calls to free() have been successfull?
+}
+END_TEST
+
+
 Suite *arch_suite (void) {
 	Suite *s = suite_create ("Options");
 
@@ -158,6 +186,11 @@ Suite *arch_suite (void) {
 	tcase_add_test (tc_core, test_concatenate_to_empty);
 	tcase_add_test (tc_core, test_concatenate_to_nonempty);
 	suite_add_tcase (s, tc_append);
+
+	TCase *tc_free = tcase_create ("Freeing");
+	tcase_add_checked_fixture (tc_core, setup, teardown);
+	tcase_add_test (tc_core, test_free_options_appended);
+	suite_add_tcase (s, tc_free);
 
 	return s;
 }
