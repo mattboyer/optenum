@@ -1,8 +1,8 @@
 language: c
 compiler:
-	- gcc
+  - gcc
 before_install:
-	- sudo apt-get install binutils binutils-dev
+  - sudo apt-get install binutils binutils-dev
 script: cmake . && make
 
-# vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list:
+# vim:set tabstop=2 softtabstop=2 shiftwidth=2 expandtab ft=yaml list:
