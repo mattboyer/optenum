@@ -109,7 +109,7 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 	// across the full ring
 	const struct disassembly_ring* first_seen = instruction;
 
-	bfd_vma option_descriptor = NULL;
+	bfd_vma option_descriptor = (bfd_vma) NULL;
 
 	int instruction_offset = 0;
 	while (instruction) {
