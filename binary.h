@@ -32,6 +32,8 @@ SUCH DAMAGE.
 
 #include "debug.h" //needed for debug stuff
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <assert.h>
 #include <stdlib.h>
