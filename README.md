@@ -2,6 +2,7 @@
 
 optenum(1) is a command-line option enumerator for ELF executables.
 
+Build status: [![Build Status](https://travis-ci.org/mattboyer/optenum.png)](https://travis-ci.org/mattboyer/optenum)
 ![Illustrative video](/doc/optenum.gif?raw=true)
 
 optenum(1) uses static analysis to extract the options accepted by a binary and lets you use [bash](http://www.gnu.org/software/bash/)'s autocompletion with options.
