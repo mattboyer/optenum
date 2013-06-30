@@ -156,9 +156,9 @@ START_TEST (test_free_options_appended)
 	struct parsed_option_list *option_two= options;
 	options = append_option(options, "baz", true, NO_DASH);
 
-	ck_assert_ptr_gt(options, NULL);
+	ck_assert_ptr_ne(options, NULL);
 	ck_assert_ptr_eq(options->prev, option_two);
-	ck_assert_str_eq(options->prev->prev, option_one);
+	ck_assert_ptr_eq(options->prev->prev, option_one);
 
 	ck_assert_ptr_ne(options->option->name, NULL);
 	ck_assert_ptr_ne(options->prev->option->name, NULL);
@@ -167,7 +167,7 @@ START_TEST (test_free_options_appended)
 	free_parsed_options(options);
 	ck_assert_ptr_ne(options, NULL);
 	ck_assert_ptr_eq(options->prev, option_two);
-	ck_assert_str_eq(options->prev->prev, option_one);
+	ck_assert_ptr_eq(options->prev->prev, option_one);
 	// How can we assert that the calls to free() have been successfull?
 }
 END_TEST
