@@ -2,6 +2,8 @@
 #include <check.h>
 #include "../disassemble.c"
 
+#define ck_assert_int_gt(X, Y) _ck_assert_int(X, >, Y)
+
 void setup (void) {
 	return;
 }
@@ -13,15 +15,15 @@ void teardown (void) {
 START_TEST (test_append_to_empty)
 {
 	struct parsed_option_list *empty = NULL;
-	ck_assert_int_eq(empty, NULL);
+	ck_assert_ptr_eq(empty, NULL);
 	empty = append_option(empty, "foo", true, ONE_DASH);
-	ck_assert_int_gt(empty, NULL);
-	ck_assert_int_eq(empty->prev, NULL);
-	ck_assert_int_eq(empty->next, NULL);
-	ck_assert_int_gt(empty->option, NULL);
+	ck_assert_ptr_ne(empty, NULL);
+	ck_assert_ptr_eq(empty->prev, NULL);
+	ck_assert_ptr_eq(empty->next, NULL);
+	ck_assert_ptr_ne(empty->option, NULL);
 
 	ck_assert_str_eq(empty->option->name, "foo");
-	ck_assert_int_eq(empty->option->description, NULL);
+	ck_assert_ptr_eq(empty->option->description, NULL);
 	ck_assert_int_eq(empty->option->takes_argument, true);
 	ck_assert_int_eq(empty->option->type, ONE_DASH);
 }
@@ -35,22 +37,22 @@ START_TEST (test_append_two)
 	struct parsed_option_list *option_one= options;
 	options = append_option(options, "bar", false, TWO_DASH);
 
-	ck_assert_int_gt(options, NULL);
-	ck_assert_int_eq(options->prev, option_one);
-	ck_assert_int_eq(options->next, NULL);
-	ck_assert_int_gt(options->option, NULL);
+	ck_assert_ptr_ne(options, NULL);
+	ck_assert_ptr_eq(options->prev, option_one);
+	ck_assert_ptr_eq(options->next, NULL);
+	ck_assert_ptr_ne(options->option, NULL);
 
 	ck_assert_str_eq(options->option->name, "bar");
-	ck_assert_int_eq(options->option->description, NULL);
+	ck_assert_ptr_eq(options->option->description, NULL);
 	ck_assert_int_eq(options->option->takes_argument, false);
 	ck_assert_int_eq(options->option->type, TWO_DASH);
 
 	ck_assert_str_eq(options->prev->option->name, "foo");
-	ck_assert_int_eq(options->prev->option->description, NULL);
+	ck_assert_ptr_eq(options->prev->option->description, NULL);
 	ck_assert_int_eq(options->prev->option->takes_argument, true);
 	ck_assert_int_eq(options->prev->option->type, ONE_DASH);
-	ck_assert_int_eq(options->prev->next, options);
-	ck_assert_int_eq(options->prev->prev, NULL);
+	ck_assert_ptr_eq(options->prev->next, options);
+	ck_assert_ptr_eq(options->prev->prev, NULL);
 }
 END_TEST
 
