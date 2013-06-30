@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <check.h>
 #include "../arch.c"
+#include "check_macros.h"
 
 bfd *test_target = NULL;
 
