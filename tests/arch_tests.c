@@ -1,17 +1,18 @@
 #include <stdlib.h>
 #include <check.h>
 #include "../arch.c"
+#include "check_macros.h"
 
 bfd *test_target = NULL;
 
 void setup (void) {
 	bfd_init();
 	test_target = bfd_fopen((const char*) "/usr/bin/uname", "default", "r", -1);
-	ck_assert_int_gt(test_target, NULL);
+	ck_assert_ptr_ne(test_target, NULL);
 	ck_assert_str_eq(test_target->filename, "/usr/bin/uname");
-	ck_assert_int_gt(test_target->section_count, 0);
+	ck_assert_int_ne(test_target->section_count, 0);
 
-	ck_assert_int_gt(test_target->arch_info, 0);
+	ck_assert_int_ne(test_target->arch_info, 0);
 	ck_assert_str_eq(test_target->arch_info->printable_name, "foo");
 }
 
@@ -21,7 +22,7 @@ void teardown (void) {
 
 START_TEST (test_is_call)
 {
-  ck_assert_int_eq (parse_call_address(test_target, "callq 0x402460"), 0x402460);
+  ck_assert_int_eq(parse_call_address(test_target, "callq 0x402460"), 0x402460);
 }
 END_TEST
 

@@ -93,8 +93,8 @@ bool debug;
 	}
 
 #else
-#define debug(...) false
-#define info(...) false
+#define debug(...)
+#define info(...)
 
 #define _error_0()
 #define _error_1(format) \

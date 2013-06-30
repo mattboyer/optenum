@@ -1,0 +1,8 @@
+language: c
+compiler:
+  - gcc
+before_install:
+  - sudo apt-get install binutils binutils-dev check libpopt0 libpopt-dev
+script: cmake . && make && ./tests/disassemble_tests
+
+# vim:set tabstop=2 softtabstop=2 shiftwidth=2 expandtab ft=yaml list:
