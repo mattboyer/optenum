@@ -105,8 +105,8 @@ START_TEST (test_concatenate_to_empty)
 	ck_assert_str_eq(left->option->name, "foo");
 	ck_assert_str_eq(left->next->option->name, "bar");
 	ck_assert_str_eq(left->next->next->option->name, "baz");
-	ck_assert_ptr_ne(left->next->next->next, NULL);
-	ck_assert_ptr_ne(left->prev, NULL);
+	ck_assert_ptr_eq(left->next->next->next, NULL);
+	ck_assert_ptr_eq(left->prev, NULL);
 }
 END_TEST
 
