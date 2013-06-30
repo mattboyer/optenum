@@ -66,23 +66,23 @@ START_TEST (test_append_three)
 	struct parsed_option_list *option_two= options;
 	options = append_option(options, "baz", true, NO_DASH);
 
-	ck_assert_int_gt(options, NULL);
+	ck_assert_ptr_ne(options, NULL);
 
-	ck_assert_int_eq(options->prev, option_two);
-	ck_assert_int_eq(options->next, NULL);
-	ck_assert_int_eq(options->prev->next, options);
-	ck_assert_int_eq(options->prev->prev, option_one);
-	ck_assert_int_eq(options->prev->prev->next, option_two);
-	ck_assert_int_eq(options->prev->prev->next->next, options);
-	ck_assert_int_eq(options->prev->prev->prev, NULL);
+	ck_assert_ptr_eq(options->prev, option_two);
+	ck_assert_ptr_eq(options->next, NULL);
+	ck_assert_ptr_eq(options->prev->next, options);
+	ck_assert_ptr_eq(options->prev->prev, option_one);
+	ck_assert_ptr_eq(options->prev->prev->next, option_two);
+	ck_assert_ptr_eq(options->prev->prev->next->next, options);
+	ck_assert_ptr_eq(options->prev->prev->prev, NULL);
 
 	ck_assert_str_eq(options->option->name, "baz");
-	ck_assert_int_eq(options->option->description, NULL);
+	ck_assert_ptr_eq(options->option->description, NULL);
 	ck_assert_int_eq(options->option->takes_argument, true);
 	ck_assert_int_eq(options->option->type, NO_DASH);
 
 	ck_assert_str_eq(options->prev->option->name, "bar");
-	ck_assert_int_eq(options->prev->option->description, NULL);
+	ck_assert_ptr_eq(options->prev->option->description, NULL);
 	ck_assert_int_eq(options->prev->option->takes_argument, false);
 	ck_assert_int_eq(options->prev->option->type, TWO_DASH);
 
@@ -96,17 +96,17 @@ START_TEST (test_concatenate_to_empty)
 	right = append_option(right, "bar", true, ONE_DASH);
 	right = append_option(right, "baz", false, TWO_DASH);
 
-	ck_assert_int_gt(right, NULL);
+	ck_assert_ptr_ne(right, NULL);
 
 	struct parsed_option_list *left = NULL;
 	concatenate_parsed_options(&left, right);
 
-	ck_assert_int_gt(left, NULL);
+	ck_assert_ptr_ne(left, NULL);
 	ck_assert_str_eq(left->option->name, "foo");
 	ck_assert_str_eq(left->next->option->name, "bar");
 	ck_assert_str_eq(left->next->next->option->name, "baz");
-	ck_assert_int_eq(left->next->next->next, NULL);
-	ck_assert_int_eq(left->prev, NULL);
+	ck_assert_ptr_ne(left->next->next->next, NULL);
+	ck_assert_ptr_ne(left->prev, NULL);
 }
 END_TEST
 
@@ -117,7 +117,7 @@ START_TEST (test_concatenate_to_nonempty)
 	right = append_option(right, "bar", true, ONE_DASH);
 	right = append_option(right, "baz", false, TWO_DASH);
 
-	ck_assert_int_gt(right, NULL);
+	ck_assert_ptr_ne(right, NULL);
 
 	struct parsed_option_list *left = NULL;
 	left = append_option(left, "alpha", true, ONE_DASH);
@@ -128,9 +128,9 @@ START_TEST (test_concatenate_to_nonempty)
 	concatenate_parsed_options(&left, right);
 	// That's really weird. It would be better to change the left list to be
 	// the head of the concatenated list
-	ck_assert_int_eq(left, old_left);
+	ck_assert_ptr_eq(left, old_left);
 
-	ck_assert_int_gt(left, NULL);
+	ck_assert_ptr_ne(left, NULL);
 	ck_assert_str_eq(left->option->name, "charlie");
 
 	ck_assert_str_eq(left->prev->option->name, "bravo");
@@ -140,8 +140,8 @@ START_TEST (test_concatenate_to_nonempty)
 	ck_assert_str_eq(left->next->next->option->name, "bar");
 	ck_assert_str_eq(left->next->next->next->option->name, "baz");
 
-	ck_assert_int_eq(left->next->next->next->next, NULL);
-	ck_assert_int_eq(left->prev->prev->prev, NULL);
+	ck_assert_ptr_eq(left->next->next->next->next, NULL);
+	ck_assert_ptr_eq(left->prev->prev->prev, NULL);
 }
 END_TEST
 
@@ -156,17 +156,17 @@ START_TEST (test_free_options_appended)
 	struct parsed_option_list *option_two= options;
 	options = append_option(options, "baz", true, NO_DASH);
 
-	ck_assert_int_gt(options, NULL);
-	ck_assert_int_eq(options->prev, option_two);
+	ck_assert_ptr_gt(options, NULL);
+	ck_assert_ptr_eq(options->prev, option_two);
 	ck_assert_str_eq(options->prev->prev, option_one);
 
-	ck_assert_int_gt(options->option->name, NULL);
-	ck_assert_int_gt(options->prev->option->name, NULL);
-	ck_assert_int_gt(options->prev->prev->option->name, NULL);
+	ck_assert_ptr_ne(options->option->name, NULL);
+	ck_assert_ptr_ne(options->prev->option->name, NULL);
+	ck_assert_ptr_ne(options->prev->prev->option->name, NULL);
 
 	free_parsed_options(options);
-	ck_assert_int_gt(options, NULL);
-	ck_assert_int_eq(options->prev, option_two);
+	ck_assert_ptr_ne(options, NULL);
+	ck_assert_ptr_eq(options->prev, option_two);
 	ck_assert_str_eq(options->prev->prev, option_one);
 	// How can we assert that the calls to free() have been successfull?
 }
