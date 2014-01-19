@@ -26,9 +26,7 @@
 # SUCH DAMAGE.
 
 function option_complete {
-	command=${1}
-
-	stem=${2}
+	local command=${1} stem=${2} enum_opt index=0;
 	# TODO In future, handle the case where the previous token on the
 	# command line is an option that expects a mandatry argument
 	[[ ${stem} = -* ]] || return 124
@@ -37,7 +35,6 @@ function option_complete {
 	[[ ${stem%-*} = "" ]] && enum_opt="-1"
 
 	enum_opt="${enum_opt} -b"
-	index=0;
 	while read option; do 
 		[[ ${option} == ${stem}* ]] || continue
 		COMPREPLY[${index}]=${option}
@@ -45,6 +42,7 @@ function option_complete {
 	done << _EOMAN
 		$(optenum ${enum_opt} $(which ${command} 2>/dev/null) 2>/dev/null)
 _EOMAN
+	unset option
 }
 
 complete -D -F option_complete -o default
