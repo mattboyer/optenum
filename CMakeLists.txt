@@ -46,6 +46,10 @@ include_directories (${PROJECT_BINARY_DIR})
 set_property (DIRECTORY . PROPERTY COMPILE_DEFINITIONS_DEBUG "DEBUG")
 #add_subdirectory("parsers")
 
+if (NOT CMAKE_BUILD_TYPE)
+	message (STATUS "Build type not specified - defaulting to RELEASE build")
+	set (CMAKE_BUILD_TYPE "RELEASE")
+endif (NOT CMAKE_BUILD_TYPE)
 
 
 file(GLOB ${PROJECT_NAME}_SRCS RELATIVE ${PROJECT_SOURCE_DIR}
@@ -136,7 +140,9 @@ find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include /usr/include/libiber
 if (NOT LIBIBERTY_HEADER)
 	message(FATAL_ERROR "libiberty header not found on this system")
 endif (NOT LIBIBERTY_HEADER)
-get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "DIRECTORY")
+
+# Travis CI has CMake version 2.8.7 so we'll use "PATH" instead of "DIRECTORY"
+get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "PATH")
 include_directories (${LIBIBERTY_INCLUDES})
 
 find_library (LIBOPCODES "opcodes")
@@ -162,10 +168,6 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
 
 
-if (NOT CMAKE_BUILD_TYPE)
-	message (STATUS "Build type not specified - defaulting to RELEASE build")
-	set (CMAKE_BUILD_TYPE "RELEASE")
-endif (NOT CMAKE_BUILD_TYPE)
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 	message (STATUS "Compiling a RELEASE build - enabling install rules")
