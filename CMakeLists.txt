@@ -46,6 +46,10 @@ include_directories (${PROJECT_BINARY_DIR})
 set_property (DIRECTORY . PROPERTY COMPILE_DEFINITIONS_DEBUG "DEBUG")
 #add_subdirectory("parsers")
 
+if (NOT CMAKE_BUILD_TYPE)
+	message (STATUS "Build type not specified - defaulting to RELEASE build")
+	set (CMAKE_BUILD_TYPE "RELEASE")
+endif (NOT CMAKE_BUILD_TYPE)
 
 
 file(GLOB ${PROJECT_NAME}_SRCS RELATIVE ${PROJECT_SOURCE_DIR}
@@ -98,18 +102,22 @@ endif (POPT_FOUND)
 find_library(LIBCHECK "check")
 find_file(CHECK_HEADER "check.h")
 if (LIBCHECK AND CHECK_HEADER)
-	message (STATUS "libcheck found - enabling unit tests")
 
-	file (MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tests")
-	file (GLOB ${PROJECT_NAME}_TEST_SRCS RELATIVE "${PROJECT_SOURCE_DIR}/tests"
-		tests/*.c
-	)
+	if (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
+		message (STATUS "libcheck found and DEBUG build - enabling unit tests")
 
-	foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
-		string (REPLACE ".c" "" test_executable ${test_source})
-		add_executable ("tests/${test_executable}" "tests/${test_source}")
-		target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z dl check)
-	endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
+		file (MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tests")
+		file (GLOB ${PROJECT_NAME}_TEST_SRCS RELATIVE "${PROJECT_SOURCE_DIR}/tests"
+			tests/*.c
+		)
+
+		foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
+			string (REPLACE ".c" "" test_executable ${test_source})
+			add_executable ("tests/${test_executable}" "tests/${test_source}")
+			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z dl check)
+		endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
+
+	endif (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
 else (LIBCHECK AND CHECK_HEADER)
 	message (STATUS "libcheck not found - no unit tests")
 endif (LIBCHECK AND CHECK_HEADER)
@@ -132,7 +140,9 @@ find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include /usr/include/libiber
 if (NOT LIBIBERTY_HEADER)
 	message(FATAL_ERROR "libiberty header not found on this system")
 endif (NOT LIBIBERTY_HEADER)
-get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "DIRECTORY")
+
+# Travis CI has CMake version 2.8.7 so we'll use "PATH" instead of "DIRECTORY"
+get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "PATH")
 include_directories (${LIBIBERTY_INCLUDES})
 
 find_library (LIBOPCODES "opcodes")
@@ -158,10 +168,6 @@ endif (CMAKE_COMPILER_IS_GNUCC)
 target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
 
 
-if (NOT CMAKE_BUILD_TYPE)
-	message (STATUS "Build type not specified - defaulting to RELEASE build")
-	set (CMAKE_BUILD_TYPE "RELEASE")
-endif (NOT CMAKE_BUILD_TYPE)
 
 if (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 	message (STATUS "Compiling a RELEASE build - enabling install rules")
