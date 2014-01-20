@@ -98,18 +98,22 @@ endif (POPT_FOUND)
 find_library(LIBCHECK "check")
 find_file(CHECK_HEADER "check.h")
 if (LIBCHECK AND CHECK_HEADER)
-	message (STATUS "libcheck found - enabling unit tests")
 
-	file (MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tests")
-	file (GLOB ${PROJECT_NAME}_TEST_SRCS RELATIVE "${PROJECT_SOURCE_DIR}/tests"
-		tests/*.c
-	)
+	if (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
+		message (STATUS "libcheck found and DEBUG build - enabling unit tests")
 
-	foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
-		string (REPLACE ".c" "" test_executable ${test_source})
-		add_executable ("tests/${test_executable}" "tests/${test_source}")
-		target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z dl check)
-	endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
+		file (MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tests")
+		file (GLOB ${PROJECT_NAME}_TEST_SRCS RELATIVE "${PROJECT_SOURCE_DIR}/tests"
+			tests/*.c
+		)
+
+		foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
+			string (REPLACE ".c" "" test_executable ${test_source})
+			add_executable ("tests/${test_executable}" "tests/${test_source}")
+			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z dl check)
+		endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
+
+	endif (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
 else (LIBCHECK AND CHECK_HEADER)
 	message (STATUS "libcheck not found - no unit tests")
 endif (LIBCHECK AND CHECK_HEADER)
