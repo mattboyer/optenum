@@ -128,7 +128,7 @@ if (NOT LIBIBERTY)
 	message(FATAL_ERROR "libiberty binary not found on this system")
 endif (NOT LIBIBERTY)
 
-find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include/libiberty)
+find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include /usr/include/libiberty)
 if (NOT LIBIBERTY_HEADER)
 	message(FATAL_ERROR "libiberty header not found on this system")
 endif (NOT LIBIBERTY_HEADER)
