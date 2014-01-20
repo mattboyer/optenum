@@ -114,15 +114,34 @@ else (LIBCHECK AND CHECK_HEADER)
 	message (STATUS "libcheck not found - no unit tests")
 endif (LIBCHECK AND CHECK_HEADER)
 
+find_library (LIBBFD "bfd")
+if (NOT LIBBFD)
+	message(FATAL_ERROR "libbfd binary not found on this system")
+endif (NOT LIBBFD)
+find_file(LIBBFD_HEADER "bfd.h")
+if (NOT LIBBFD_HEADER)
+	message(FATAL_ERROR "libbfd header not found on this system")
+endif (NOT LIBBFD_HEADER)
 
 find_library (LIBIBERTY "iberty")
-find_library (LIBBFD "bfd")
+if (NOT LIBIBERTY)
+	message(FATAL_ERROR "libiberty binary not found on this system")
+endif (NOT LIBIBERTY)
+
+find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include/libiberty)
+if (NOT LIBIBERTY_HEADER)
+	message(FATAL_ERROR "libiberty header not found on this system")
+endif (NOT LIBIBERTY_HEADER)
+get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "DIRECTORY")
+include_directories (${LIBIBERTY_INCLUDES})
+
 find_library (LIBOPCODES "opcodes")
+
 find_library (ZLIB "z")
 find_library (DL "dl")
 
-message(STATUS "Linking against libiberty file: ${LIBIBERTY}")
-message(STATUS "Linking against libbfd file: ${LIBBFD}")
+message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeaders ${LIBIBERTY_HEADER}")
+message(STATUS "Linking against libbfd:\n\tLib: ${LIBBFD}\n\tHeader: ${LIBBFD_HEADER}")
 message(STATUS "Linking against libopcodes file: ${LIBOPCODES}")
 
 
