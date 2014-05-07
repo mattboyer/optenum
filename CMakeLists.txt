@@ -26,10 +26,10 @@
 # SUCH DAMAGE.
 
 cmake_minimum_required (VERSION 2.6)
-project (OPTENUM)
+project (OPTENUM CXX)
 string(TOLOWER ${PROJECT_NAME} EXEC_NAME)
 set (VERSION_MAJOR 0)
-set (VERSION_MINOR 10)
+set (VERSION_MINOR 20)
 
 # Make the Git revision part of the the version information baked
 # into optenum_config.h
@@ -53,11 +53,11 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 
 file(GLOB ${PROJECT_NAME}_SRCS RELATIVE ${PROJECT_SOURCE_DIR}
-	*.c
+	*.cpp
 	# The following are argument parsing modules
-	parsers/getopt.c
+	parsers/getopt.cpp
 
-	arch/*.c
+	arch/*.cpp
 )
 
 find_package (PkgConfig)
@@ -72,7 +72,7 @@ if (GLIB2_FOUND)
 		message(STATUS "Building parser for GLib's g_option_* - header"
 			" at ${GLIB2_HEADER}")
 		include_directories (${GLIB2_INCLUDE_DIRS})
-		list (APPEND ${PROJECT_NAME}_SRCS parsers/glib.c)
+		list (APPEND ${PROJECT_NAME}_SRCS parsers/glib.cpp)
 		file (APPEND "${PROJECT_BINARY_DIR}/optenum_config.h"
 			"#define HAVE_GLIB2\n"
 		)
@@ -89,7 +89,7 @@ if (POPT_FOUND)
 		message(STATUS "Building parser for popt's poptGetContext - "
 			"header at ${POPT_HEADER}")
 		include_directories (${POPT_INCLUDE_DIRS})
-		list (APPEND ${PROJECT_NAME}_SRCS parsers/popt.c)
+		list (APPEND ${PROJECT_NAME}_SRCS parsers/popt.cpp)
 		file (APPEND "${PROJECT_BINARY_DIR}/optenum_config.h"
 			"#define HAVE_POPT\n"
 		)
@@ -108,11 +108,11 @@ if (LIBCHECK AND CHECK_HEADER)
 
 		file (MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/tests")
 		file (GLOB ${PROJECT_NAME}_TEST_SRCS RELATIVE "${PROJECT_SOURCE_DIR}/tests"
-			tests/*.c
+			tests/*.cpp
 		)
 
 		foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
-			string (REPLACE ".c" "" test_executable ${test_source})
+			string (REPLACE ".cpp" "" test_executable ${test_source})
 			add_executable ("tests/${test_executable}" "tests/${test_source}")
 			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z dl check)
 		endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
