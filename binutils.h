@@ -33,6 +33,8 @@ SUCH DAMAGE.
  * We'll work around that by temporarily defining then undefining these
  * preprocessor macros
  */
+#include <libiberty/ansidecl.h>
+
 #define PACKAGE
 #define PACKAGE_VERSION
 #include <bfd.h>
