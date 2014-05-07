@@ -41,6 +41,7 @@ set (VERSION_CHANGESET ${GIT_REVISION})
 
 configure_file ("${PROJECT_SOURCE_DIR}/optenum_config.h.in"
     "${PROJECT_BINARY_DIR}/optenum_config.h")
+
 include_directories (${PROJECT_BINARY_DIR})
 
 set_property (DIRECTORY . PROPERTY COMPILE_DEFINITIONS_DEBUG "DEBUG")
@@ -153,6 +154,14 @@ find_library (DL "dl")
 message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeaders ${LIBIBERTY_HEADER}")
 message(STATUS "Linking against libbfd:\n\tLib: ${LIBBFD}\n\tHeader: ${LIBBFD_HEADER}")
 message(STATUS "Linking against libopcodes file: ${LIBOPCODES}")
+
+if (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
+	set (ANSIDECL_SOURCE ${LIBIBERTY_INCLUDES}/ansidecl.h)
+else (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
+	set (ANSIDECL_SOURCE ansidecl.h)
+endif (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
+configure_file ("${PROJECT_SOURCE_DIR}/binutils.h.in"
+    "${PROJECT_BINARY_DIR}/binutils.h")
 
 
 add_executable (${EXEC_NAME} ${${PROJECT_NAME}_SRCS})

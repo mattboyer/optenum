@@ -27,14 +27,15 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
+/* #include the right version of ansidecl.h */
+#include "@ANSIDECL_SOURCE@"
+
 /* Kludge alert!!
  * bfd.h will cause a preprocessor #error if PACKAGE and PACKAGE_VERSION aren't
  * defined.
  * We'll work around that by temporarily defining then undefining these
  * preprocessor macros
  */
-#include <libiberty/ansidecl.h>
-
 #define PACKAGE
 #define PACKAGE_VERSION
 #include <bfd.h>

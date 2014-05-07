@@ -32,7 +32,7 @@ SUCH DAMAGE.
 #include <stdlib.h>
 #include <string.h>
 
-#include "../binutils.h"
+#include "binutils.h"
 
 // Provides binary access functions
 #include "../binary.h"

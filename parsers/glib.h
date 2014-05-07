@@ -29,7 +29,7 @@ SUCH DAMAGE.
 
 #include "../debug.h" //needed for debug stuff
 
-#include "../binutils.h"
+#include "binutils.h"
 
 // Provides binary access functions
 #include "../binary.h"

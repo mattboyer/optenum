@@ -30,7 +30,7 @@ SUCH DAMAGE.
 #ifndef __TABBER_ARCH_X86_64_H
 #define __TABBER_ARCH_X86_64_H
 
-#include "../binutils.h"
+#include "binutils.h"
 #include "../disassemble.h"
 
 
