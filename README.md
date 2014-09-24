@@ -32,7 +32,7 @@ All that's left to do is make sure the completion function is sourced and regist
 
 optenum(1) uses `libbfd` from the [GNU binutils](http://www.gnu.org/software/binutils/) to parse the dynamic symbols used by a binary executable and disassemble its code.
 
-When it finds a call to one of the supported option-parsing functions below, optenum will attempt to reconstitute the arguments passed as part of the call and, in the even the argument(s) that describes valid options has successfully been retrieved and points to a chunk of data hardcoded in the binary, finally parses it and exposes options to the user.
+When it finds a call to one of the supported option-parsing functions below, optenum will attempt to reconstitute the arguments passed as part of the call and, in the event the argument(s) that describes valid options has successfully been retrieved and points to a chunk of data hardcoded in the binary, finally parses it and exposes options to the user.
 
 optenum(1) **never** executes foreign code and doesn't rely on any particular behaviour in the target binary. No usage message? No problem!
 
