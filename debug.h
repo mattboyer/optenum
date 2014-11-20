@@ -27,8 +27,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#ifndef __TABBER_DEBUG_H
-#define __TABBER_DEBUG_H
+#ifndef __OPTENUM_DEBUG_H
+#define __OPTENUM_DEBUG_H
 
 #include "optenum_config.h"
 
@@ -133,4 +133,4 @@ bool debug;
 ) 
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

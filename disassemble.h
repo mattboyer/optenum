@@ -27,8 +27,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#ifndef __TABBER_DISASSEMBLE_H
-#define __TABBER_DISASSEMBLE_H
+#ifndef __OPTENUM_DISASSEMBLE_H
+#define __OPTENUM_DISASSEMBLE_H
 
 
 
@@ -112,4 +112,4 @@ int buf_fprintf(struct disassembly_pseudo_file *, const char *, ...);
 
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */
