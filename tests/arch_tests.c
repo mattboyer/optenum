@@ -52,4 +52,4 @@ int main (void) {
 	return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

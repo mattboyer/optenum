@@ -143,4 +143,4 @@ ARCH_DISPATCH(is_call, bool, struct disassembly_ring *)
 ARCH_DISPATCH(parse_ring_for_call_arg, bfd_vma, const struct disassembly_ring *,
 	const unsigned int)
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

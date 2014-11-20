@@ -27,8 +27,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#ifndef __TABBER_H
-#define __TABBER_H
+#ifndef __OPTENUM_H
+#define __OPTENUM_H
 
 
 #include "binutils.h"
@@ -73,4 +73,4 @@ void print_version();
 void usage();
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

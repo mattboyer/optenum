@@ -78,4 +78,4 @@ struct parsed_option_list *parse_goption_main_entries(bfd *binary_bfd, const bfd
 	return options_found;
 }
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

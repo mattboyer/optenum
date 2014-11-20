@@ -47,4 +47,4 @@ _EOMAN
 
 complete -D -F option_complete -o default
 
-# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab list:
+# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab :

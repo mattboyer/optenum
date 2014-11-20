@@ -27,8 +27,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
 */
 
-#ifndef __TABBER_ARCH_H
-#define __TABBER_ARCH_H
+#ifndef __OPTENUM_ARCH_H
+#define __OPTENUM_ARCH_H
 
 #include "binutils.h"
 
@@ -44,4 +44,4 @@ bfd_vma parse_ring_for_call_arg(bfd*, const struct disassembly_ring *,
 	const unsigned int);
 
 #endif
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

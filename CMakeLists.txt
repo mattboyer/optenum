@@ -190,4 +190,4 @@ endif (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 #enable_testing()
 #add_test(NAME foo COMMAND "/usr/bin/false")
 
-# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab list:
+# vim:set tabstop=8 softtabstop=8 shiftwidth=8 noexpandtab :

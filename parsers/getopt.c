@@ -139,4 +139,4 @@ struct parsed_option_list *iterate_long_opts(bfd *binary_bfd, const bfd_vma long
 	return options_found;
 }
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

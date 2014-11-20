@@ -46,4 +46,4 @@ struct parsed_option_list *parse_popt(bfd *, const bfd_vma);
 #define popt_parsers\
 	{"poptGetContext", NULL, 0, parse_popt, 4}, 
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

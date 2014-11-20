@@ -87,4 +87,4 @@ struct parsed_option_list *parse_popt(bfd *binary_bfd, const bfd_vma option_entr
 
 
 }
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */

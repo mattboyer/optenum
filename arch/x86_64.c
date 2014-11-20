@@ -178,4 +178,4 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 	return option_descriptor;
 }
 
-/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab list: */
+/* vim:set tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab : */
