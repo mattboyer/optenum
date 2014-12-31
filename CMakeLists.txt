@@ -115,7 +115,7 @@ if (LIBCHECK AND CHECK_HEADER)
 		foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
 			string (REPLACE ".c" "" test_executable ${test_source})
 			add_executable ("tests/${test_executable}" "tests/${test_source}")
-			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z check ${CMAKE_DL_LIBS})
+			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes check ${CMAKE_DL_LIBS})
 		endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
 
 	endif (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
@@ -123,21 +123,76 @@ else (LIBCHECK AND CHECK_HEADER)
 	message (STATUS "libcheck not found - no unit tests")
 endif (LIBCHECK AND CHECK_HEADER)
 
-find_library (LIBBFD "libbfd-2.25.so")
-if (NOT LIBBFD)
-	message(FATAL_ERROR "libbfd binary not found on this system")
-endif (NOT LIBBFD)
 find_file(LIBBFD_HEADER "bfd.h")
 if (NOT LIBBFD_HEADER)
 	message(FATAL_ERROR "libbfd header not found on this system")
 endif (NOT LIBBFD_HEADER)
 
+#
+# If at all possible, we want the executable to link against shared objects for
+# libbfd and libopcodes.
+# Unfortunately, just passing '-lbfd -lopcodes' to the compiler at linking time
+# tends to result in a huge executable statically linked against libbfd.a and
+# libopcodes.a
+#
+# This is further complicated by the fact that some distros ship a
+# libbfd.so/libopcodes.so file that is *not* an actual shared object, but
+# rather a linker script pointing to their respective .a archive.
+#
+# This means we cannot just give "libbfd.so" as argument to CMake's
+# find_library, we'll have to dynamically discover whether there is an "actual"
+# shared object with a versioned filename (eg. "libbfd-2.25.so") and give this
+# to find_library() with an option to fall back on the .so file in the hope
+# that it's a symlink to a real shared object and failing that, the .a
+# archive.
+#
+# At any rate, the variable set by find_library() is then used to set the
+# IMPORTED_LOCATION of a CMake "imported" target for that third-party library.
+# This ensures the right path is given to the compiler in the make rule that
+# links the executable.
+#
+foreach (library_path ${CMAKE_SYSTEM_PREFIX_PATH})
+	file (GLOB bfd_so_path RELATIVE "${library_path}/lib64" "${library_path}/lib64/libbfd-*.so")
+	if (bfd_so_path)
+		break ()
+	endif (bfd_so_path)
+endforeach (library_path)
+
+find_library (LIBBFD ${bfd_so_path} NAMES "libbfd.so" "libbfd.a")
+if (NOT LIBBFD)
+	message(FATAL_ERROR "libbfd library not found on this system")
+endif (NOT LIBBFD)
+
 add_library ("my_shared_bfd" SHARED IMPORTED)
 set_target_properties ("my_shared_bfd" PROPERTIES IMPORTED_LOCATION ${LIBBFD})
 
+
+
+
+#### OPCODES #####
+foreach (library_path ${CMAKE_SYSTEM_PREFIX_PATH})
+	file (GLOB opcodes_so_path RELATIVE "${library_path}/lib64" "${library_path}/lib64/libopcodes-*.so")
+	if (opcodes_so_path)
+		break ()
+	endif (opcodes_so_path)
+endforeach (library_path)
+
+find_library (LIBOPCODES ${opcodes_so_path} NAMES "libopcodes.so" "libopcodes.a")
+if (NOT LIBOPCODES)
+	message(FATAL_ERROR "libopcodes library not found on this system")
+endif (NOT LIBOPCODES)
+
+add_library ("my_shared_opcodes" SHARED IMPORTED)
+set_target_properties ("my_shared_opcodes" PROPERTIES IMPORTED_LOCATION ${LIBOPCODES})
+
+
+# I've yet to see a shared object file for libiberty on an actual distro, so
+# using find_library() to check the presence of libiberty.a is enough. 
+# TODO Do we even need this? We don't pass iberty in target_link_libraries()
+# for the executable
 find_library (LIBIBERTY "iberty")
 if (NOT LIBIBERTY)
-	message(FATAL_ERROR "libiberty binary not found on this system")
+	message(FATAL_ERROR "libiberty library not found on this system")
 endif (NOT LIBIBERTY)
 
 find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include /usr/include/libiberty)
@@ -149,15 +204,10 @@ endif (NOT LIBIBERTY_HEADER)
 get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "PATH")
 include_directories (${LIBIBERTY_INCLUDES})
 
-find_library (LIBOPCODES "libopcodes-2.25.so")
-add_library ("my_shared_opcodes" SHARED IMPORTED)
-set_target_properties ("my_shared_opcodes" PROPERTIES IMPORTED_LOCATION ${LIBOPCODES})
 
-find_library (ZLIB "z")
-
-message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeaders ${LIBIBERTY_HEADER}")
 message(STATUS "Linking against libbfd:\n\tLib: ${LIBBFD}\n\tHeader: ${LIBBFD_HEADER}")
-message(STATUS "Linking against libopcodes file: ${LIBOPCODES}")
+message(STATUS "Linking against libopcodes:\n\tLib: ${LIBOPCODES}")
+message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeaders ${LIBIBERTY_HEADER}")
 
 if (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
 	set (ANSIDECL_SOURCE ${LIBIBERTY_INCLUDES}/ansidecl.h)
