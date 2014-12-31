@@ -123,7 +123,7 @@ else (LIBCHECK AND CHECK_HEADER)
 	message (STATUS "libcheck not found - no unit tests")
 endif (LIBCHECK AND CHECK_HEADER)
 
-find_library (LIBBFD "bfd")
+find_library (LIBBFD "libbfd-2.25.so")
 if (NOT LIBBFD)
 	message(FATAL_ERROR "libbfd binary not found on this system")
 endif (NOT LIBBFD)
@@ -131,6 +131,9 @@ find_file(LIBBFD_HEADER "bfd.h")
 if (NOT LIBBFD_HEADER)
 	message(FATAL_ERROR "libbfd header not found on this system")
 endif (NOT LIBBFD_HEADER)
+
+add_library ("my_shared_bfd" SHARED IMPORTED)
+set_target_properties ("my_shared_bfd" PROPERTIES IMPORTED_LOCATION ${LIBBFD})
 
 find_library (LIBIBERTY "iberty")
 if (NOT LIBIBERTY)
@@ -146,7 +149,9 @@ endif (NOT LIBIBERTY_HEADER)
 get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "PATH")
 include_directories (${LIBIBERTY_INCLUDES})
 
-find_library (LIBOPCODES "opcodes")
+find_library (LIBOPCODES "libopcodes-2.25.so")
+add_library ("my_shared_opcodes" SHARED IMPORTED)
+set_target_properties ("my_shared_opcodes" PROPERTIES IMPORTED_LOCATION ${LIBOPCODES})
 
 find_library (ZLIB "z")
 
@@ -164,6 +169,11 @@ configure_file ("${PROJECT_SOURCE_DIR}/binutils.h.in"
 
 
 add_executable (${EXEC_NAME} ${${PROJECT_NAME}_SRCS})
+# libbfd requires libdl and libz
+# Since giving, eg. "bfd" here would result in the compiler statically linking
+# bfd.a into the executable, we need to our own imported library targets
+#target_link_libraries (${EXEC_NAME} my_shared_bfd iberty my_shared_opcodes z ${CMAKE_DL_LIBS})
+target_link_libraries (${EXEC_NAME} my_shared_bfd my_shared_opcodes ${CMAKE_DL_LIBS})
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	message (STATUS "GCC detected - making compiler pedantic")
@@ -172,8 +182,6 @@ if (CMAKE_COMPILER_IS_GNUCC)
 	)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
-# libbfd requires libdl and libz
-target_link_libraries (${EXEC_NAME} bfd iberty opcodes z ${CMAKE_DL_LIBS})
 
 
 
