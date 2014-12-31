@@ -184,7 +184,7 @@ if (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 	install(FILES "${EXEC_NAME}.sh" DESTINATION "share/optenum")
 	install(FILES "doc/${EXEC_NAME}.1" DESTINATION "share/man/man1")
 else (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
-	message (WARNING "Install rules are only available for DEBUG builds.")
+	message (STATUS "Install rules are only available for RELEASE builds")
 endif (${CMAKE_BUILD_TYPE} STREQUAL "RELEASE")
 
 #enable_testing()
