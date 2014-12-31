@@ -164,21 +164,12 @@ function (find_binutils_dep libname)
 		message(FATAL_ERROR "lib${libname} library not found on this system")
 	endif (NOT ${libname}_path)
 
-	add_library ("shared_${libname}" SHARED IMPORTED)
-	set_target_properties ("shared_${libname}" PROPERTIES IMPORTED_LOCATION ${${libname}_path})
+	add_library ("binutils_dep_${libname}" SHARED IMPORTED)
+	set_target_properties ("binutils_dep_${libname}" PROPERTIES IMPORTED_LOCATION ${${libname}_path})
 endfunction (find_binutils_dep)
 
 find_binutils_dep (bfd)
 find_binutils_dep (opcodes)
-
-# I've yet to see a shared object file for libiberty on an actual distro, so
-# using find_library() to check the presence of libiberty.a is enough. 
-# TODO Do we even need this? We don't pass iberty in target_link_libraries()
-# for the executable
-find_library (LIBIBERTY "iberty")
-if (NOT LIBIBERTY)
-	message(FATAL_ERROR "libiberty library not found on this system")
-endif (NOT LIBIBERTY)
 
 find_file(LIBIBERTY_HEADER "libiberty.h" PATHS /usr/include /usr/include/libiberty)
 if (NOT LIBIBERTY_HEADER)
@@ -192,7 +183,7 @@ include_directories (${LIBIBERTY_INCLUDES})
 
 message(STATUS "Linking against libbfd:\n\tLib: ${bfd_path}\n\tHeader: ${LIBBFD_HEADER}")
 message(STATUS "Linking against libopcodes:\n\tLib: ${opcodes_path}")
-message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeader: ${LIBIBERTY_HEADER}")
+message(STATUS "Using libiberty header: ${LIBIBERTY_HEADER}")
 
 if (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
 	set (ANSIDECL_SOURCE ${LIBIBERTY_INCLUDES}/ansidecl.h)
@@ -204,10 +195,7 @@ configure_file ("${PROJECT_SOURCE_DIR}/binutils.h.in"
 
 
 add_executable (${EXEC_NAME} ${${PROJECT_NAME}_SRCS})
-# libbfd requires libdl and libz
-# Since giving, eg. "bfd" here would result in the compiler statically linking
-# bfd.a into the executable, we need to our own imported library targets
-target_link_libraries (${EXEC_NAME} shared_bfd shared_opcodes ${CMAKE_DL_LIBS})
+target_link_libraries (${EXEC_NAME} binutils_dep_bfd binutils_dep_opcodes ${CMAKE_DL_LIBS})
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	message (STATUS "GCC detected - making compiler pedantic")
