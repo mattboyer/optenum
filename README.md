@@ -58,5 +58,3 @@ optenum(1) only supports `x86_64` argument passing conventions at this time. Sup
 ##Contact
 
 Please send bug reports to `mboyer <AT> sdf <DOT> org`.
-
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/2cd433a32cf0bbba89a7470120fb1d44 "githalytics.com")](http://githalytics.com/mattboyer/optenum)
