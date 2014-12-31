@@ -115,7 +115,7 @@ if (LIBCHECK AND CHECK_HEADER)
 		foreach (test_source ${${PROJECT_NAME}_TEST_SRCS})
 			string (REPLACE ".c" "" test_executable ${test_source})
 			add_executable ("tests/${test_executable}" "tests/${test_source}")
-			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z dl check)
+			target_link_libraries ("tests/${test_executable}" bfd iberty opcodes z check ${CMAKE_DL_LIBS})
 		endforeach (test_source ${${PROJECT_NAME}_TEST_SRCS})
 
 	endif (${CMAKE_BUILD_TYPE} STREQUAL "DEBUG")
@@ -149,7 +149,6 @@ include_directories (${LIBIBERTY_INCLUDES})
 find_library (LIBOPCODES "opcodes")
 
 find_library (ZLIB "z")
-find_library (DL "dl")
 
 message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeaders ${LIBIBERTY_HEADER}")
 message(STATUS "Linking against libbfd:\n\tLib: ${LIBBFD}\n\tHeader: ${LIBBFD_HEADER}")
@@ -174,7 +173,7 @@ if (CMAKE_COMPILER_IS_GNUCC)
 endif (CMAKE_COMPILER_IS_GNUCC)
 
 # libbfd requires libdl and libz
-target_link_libraries (${EXEC_NAME} bfd iberty opcodes z dl)
+target_link_libraries (${EXEC_NAME} bfd iberty opcodes z ${CMAKE_DL_LIBS})
 
 
 
