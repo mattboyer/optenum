@@ -151,40 +151,25 @@ endif (NOT LIBBFD_HEADER)
 # This ensures the right path is given to the compiler in the make rule that
 # links the executable.
 #
-foreach (library_path ${CMAKE_SYSTEM_PREFIX_PATH})
-	file (GLOB bfd_so_path RELATIVE "${library_path}/lib64" "${library_path}/lib64/libbfd-*.so")
-	if (bfd_so_path)
-		break ()
-	endif (bfd_so_path)
-endforeach (library_path)
+function (find_binutils_dep libname)
+	foreach (library_path ${CMAKE_SYSTEM_PREFIX_PATH})
+		file (GLOB ${libname}_so_path RELATIVE "${library_path}/lib64" "${library_path}/lib64/lib${libname}-*.so")
+		if (${libname}_so_path)
+			break ()
+		endif (${libname}_so_path)
+	endforeach (library_path)
 
-find_library (LIBBFD ${bfd_so_path} NAMES "libbfd.so" "libbfd.a")
-if (NOT LIBBFD)
-	message(FATAL_ERROR "libbfd library not found on this system")
-endif (NOT LIBBFD)
+	find_library (${libname}_path ${${libname}_so_path} NAMES "lib${libname}.so" "lib${libname}.a")
+	if (NOT ${libname}_path)
+		message(FATAL_ERROR "lib${libname} library not found on this system")
+	endif (NOT ${libname}_path)
 
-add_library ("my_shared_bfd" SHARED IMPORTED)
-set_target_properties ("my_shared_bfd" PROPERTIES IMPORTED_LOCATION ${LIBBFD})
+	add_library ("shared_${libname}" SHARED IMPORTED)
+	set_target_properties ("shared_${libname}" PROPERTIES IMPORTED_LOCATION ${${libname}_path})
+endfunction (find_binutils_dep)
 
-
-
-
-#### OPCODES #####
-foreach (library_path ${CMAKE_SYSTEM_PREFIX_PATH})
-	file (GLOB opcodes_so_path RELATIVE "${library_path}/lib64" "${library_path}/lib64/libopcodes-*.so")
-	if (opcodes_so_path)
-		break ()
-	endif (opcodes_so_path)
-endforeach (library_path)
-
-find_library (LIBOPCODES ${opcodes_so_path} NAMES "libopcodes.so" "libopcodes.a")
-if (NOT LIBOPCODES)
-	message(FATAL_ERROR "libopcodes library not found on this system")
-endif (NOT LIBOPCODES)
-
-add_library ("my_shared_opcodes" SHARED IMPORTED)
-set_target_properties ("my_shared_opcodes" PROPERTIES IMPORTED_LOCATION ${LIBOPCODES})
-
+find_binutils_dep (bfd)
+find_binutils_dep (opcodes)
 
 # I've yet to see a shared object file for libiberty on an actual distro, so
 # using find_library() to check the presence of libiberty.a is enough. 
@@ -205,9 +190,9 @@ get_filename_component(LIBIBERTY_INCLUDES ${LIBIBERTY_HEADER} "PATH")
 include_directories (${LIBIBERTY_INCLUDES})
 
 
-message(STATUS "Linking against libbfd:\n\tLib: ${LIBBFD}\n\tHeader: ${LIBBFD_HEADER}")
-message(STATUS "Linking against libopcodes:\n\tLib: ${LIBOPCODES}")
-message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeaders ${LIBIBERTY_HEADER}")
+message(STATUS "Linking against libbfd:\n\tLib: ${bfd_path}\n\tHeader: ${LIBBFD_HEADER}")
+message(STATUS "Linking against libopcodes:\n\tLib: ${opcodes_path}")
+message(STATUS "Linking against libiberty:\n\tLib: ${LIBIBERTY}\n\tHeader: ${LIBIBERTY_HEADER}")
 
 if (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
 	set (ANSIDECL_SOURCE ${LIBIBERTY_INCLUDES}/ansidecl.h)
@@ -222,8 +207,7 @@ add_executable (${EXEC_NAME} ${${PROJECT_NAME}_SRCS})
 # libbfd requires libdl and libz
 # Since giving, eg. "bfd" here would result in the compiler statically linking
 # bfd.a into the executable, we need to our own imported library targets
-#target_link_libraries (${EXEC_NAME} my_shared_bfd iberty my_shared_opcodes z ${CMAKE_DL_LIBS})
-target_link_libraries (${EXEC_NAME} my_shared_bfd my_shared_opcodes ${CMAKE_DL_LIBS})
+target_link_libraries (${EXEC_NAME} shared_bfd shared_opcodes ${CMAKE_DL_LIBS})
 
 if (CMAKE_COMPILER_IS_GNUCC)
 	message (STATUS "GCC detected - making compiler pedantic")
