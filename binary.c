@@ -211,7 +211,7 @@ void filter_section_for_call(bfd *binary_bfd, asection *code_section, struct opt
 	disassembler_ftype disasser = disassembler(binary_bfd);
 
 	// We need to prepare a struct disassemble_info - this will control the
-	// content of the disassembled text printed out by the disassemler
+	// content of the disassembled text printed out by the disassembler
 	// function pointed to by disasser above
 	struct disassemble_info *dinfo = (struct disassemble_info *) xmalloc(sizeof(struct disassemble_info));
 
@@ -226,10 +226,18 @@ void filter_section_for_call(bfd *binary_bfd, asection *code_section, struct opt
 	dinfo->bytes_per_line = 0;
 	dinfo->bytes_per_chunk = 0;
 
+	// On SL6.6, this somehow ends up being a buffer containing a debug string
 	dinfo->buffer = section_data;
 	dinfo->buffer_vma = code_section->vma;
 	dinfo->buffer_length = sec_size;
 	dinfo->section = code_section;
+
+	// We need to set the arch and mach members, as we cannot rely on the
+	// disassembler_ftype function we're going to call to do the right thing
+	// when these members are 0. Some versions of libopcodes will abort(3) in
+	// that scenario.
+	dinfo->arch = bfd_get_arch(binary_bfd);
+	dinfo->mach = bfd_get_mach(binary_bfd);
 
 	size_t bytes_disassd = 0;
 	while (bytes_disassd<sec_size) {
