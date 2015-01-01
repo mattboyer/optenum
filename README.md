@@ -30,7 +30,7 @@ All that's left to do is make sure the completion function is sourced and regist
 
 ##About
 
-optenum(1) uses `libbfd` from the [GNU binutils](http://www.gnu.org/software/binutils/) to parse the dynamic symbols used by a binary executable and disassemble its code.
+optenum(1) uses `libbfd` and `libopcodes` from the [GNU binutils](http://www.gnu.org/software/binutils/) package to parse the dynamic symbols used by a binary executable and disassemble its code.
 
 When it finds a call to one of the supported option-parsing functions below, optenum will attempt to reconstitute the arguments passed as part of the call and, in the event the argument(s) that describes valid options has successfully been retrieved and points to a chunk of data hardcoded in the binary, finally parses it and exposes options to the user.
 
@@ -38,7 +38,9 @@ optenum(1) **never** executes foreign code and doesn't rely on any particular be
 
 There are several moving parts and optenum operates on a best-effort basis. When optenum can't retrieve options, it will try to fail gracefully and fail fast.
 
-##Compatibility
+##Support
+
+###Option parsing functions
 
 optenum(1) extracts options from binary executables by relying on the assumption that the task of defining valid command line options is done through a call to one of the following supported functions:
 
@@ -53,8 +55,10 @@ optenum(1) extracts options from binary executables by relying on the assumption
 </tbody>
 </table>
 
-optenum(1) only supports `x86_64` argument passing conventions at this time. Support for 32-bit `i386` binaries is planned with other architectures a possibility.
+###Architectures
+
+optenum(1) only supports `x86_64` argument passing conventions at this time.
 
 ##Contact
 
-Please send bug reports to `mboyer <AT> sdf <DOT> org`.
+Please log any bugs you may encounter using the GitHub [issue tracker](https://github.com/mattboyer/optenum/issues) or alternatively send a mail to `mboyer <AT> sdf <DOT> org`.
