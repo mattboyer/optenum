@@ -1,10 +1,12 @@
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
+install_manifest.txt
 
 Makefile
 optenum
 optenum_config.h
 binutils.h
+optenum.sh
 
 examples/

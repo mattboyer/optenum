@@ -42,7 +42,10 @@ set (VERSION_CHANGESET ${GIT_REVISION})
 configure_file ("${PROJECT_SOURCE_DIR}/optenum_config.h.in"
     "${PROJECT_BINARY_DIR}/optenum_config.h")
 
-set (dynamic_includes "optenum_config.h" "binutils.h")
+configure_file ("${PROJECT_SOURCE_DIR}/optenum.sh.in"
+	"${PROJECT_BINARY_DIR}/optenum.sh" @ONLY)
+
+set (dynamic_includes "optenum_config.h" "binutils.h" "optenum.sh")
 set_directory_properties (${PROJECT_BINARY_DIR} ADDITIONAL_MAKE_CLEAN_FILES "${dynamic_includes}")
 include_directories (${PROJECT_BINARY_DIR})
 
