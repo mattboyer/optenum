@@ -42,6 +42,8 @@ set (VERSION_CHANGESET ${GIT_REVISION})
 configure_file ("${PROJECT_SOURCE_DIR}/optenum_config.h.in"
     "${PROJECT_BINARY_DIR}/optenum_config.h")
 
+set (dynamic_includes "optenum_config.h" "binutils.h")
+set_directory_properties (${PROJECT_BINARY_DIR} ADDITIONAL_MAKE_CLEAN_FILES "${dynamic_includes}")
 include_directories (${PROJECT_BINARY_DIR})
 
 set_property (DIRECTORY . PROPERTY COMPILE_DEFINITIONS_DEBUG "DEBUG")
@@ -195,6 +197,7 @@ if (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
 else (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
 	set (ANSIDECL_SOURCE ansidecl.h)
 endif (EXISTS ${LIBIBERTY_INCLUDES}/ansidecl.h)
+
 configure_file ("${PROJECT_SOURCE_DIR}/binutils.h.in"
     "${PROJECT_BINARY_DIR}/binutils.h")
 
