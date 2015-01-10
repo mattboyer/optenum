@@ -60,13 +60,23 @@ int x86_64__parse_lea(char* inst_line, char **src, char**dst) {
 	while( (inst_args[comment_char_idx] != 0x0) && (inst_args[comment_char_idx] != '#'))
 		comment_char_idx++;
 
-	strncpy(lea_dst_buffer, &inst_args[arg_separator_idx+1], (comment_char_idx - arg_separator_idx - 1));
-	strncpy(lea_comment_buffer, &inst_args[comment_char_idx+1], (DISASSEMBLY_BUFFER_LENGTH - (arg_idx + comment_char_idx)));
+	// This is wrong *and* ugly
+	unsigned int second_arg_end_idx = arg_separator_idx;
+	while( (inst_args[second_arg_end_idx] != 0x0) && (inst_args[second_arg_end_idx] != ' '))
+		second_arg_end_idx++;
 
-	*src = lea_src_buffer;
+	// This is equally wrong
+	unsigned int comment_start_idx = comment_char_idx;
+	while( (inst_args[comment_start_idx] != 0x0) && (inst_args[comment_start_idx] != ' '))
+		comment_start_idx++;
+
+	strncpy(lea_dst_buffer, &inst_args[arg_separator_idx+1], (second_arg_end_idx - arg_separator_idx - 1));
+	strncpy(lea_comment_buffer, &inst_args[comment_start_idx+1], (DISASSEMBLY_BUFFER_LENGTH - (arg_idx + comment_start_idx)));
+
+
+	info("LEA parsed as:\n\tSRC: %s\n\tDST:-%s-\n\tComment: -%s-\n", lea_src_buffer, lea_dst_buffer, lea_comment_buffer);
+	*src = lea_comment_buffer;
 	*dst = lea_dst_buffer;
-
-	info("LEA parsed as:\n\tSRC: %s\n\tDST: %s\n\tComment: %s\n", lea_src_buffer, lea_dst_buffer, lea_comment_buffer);
 
 	return 0;
 }
@@ -92,7 +102,7 @@ int x86_64__parse_mov(char* inst_line, char **src, char**dst) {
 	while( (inst_args[arg_separator_idx] != 0x0) && (inst_args[arg_separator_idx] != ','))
 		arg_separator_idx++;
 
-	strncpy(mov_src_buffer, inst_args, arg_separator_idx);
+	strncpy(mov_src_buffer, inst_args+1, arg_separator_idx);
 	strncpy(mov_dst_buffer, &inst_args[arg_separator_idx+1], (DISASSEMBLY_BUFFER_LENGTH - (arg_idx + arg_separator_idx)));
 
 	*src = mov_src_buffer;
@@ -166,6 +176,10 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 		if (instruction != first_seen && x86_64__is_call((struct disassembly_ring*) instruction))
 			break;
 
+		// This should be the same irrespective of the instruction used to load
+		// a value into the register
+		debug("Looking for an instruction loading a value into %s\n", dest_registers[arg_pos]);
+
 		// Argument passing (at least for pointers) is done on x86_64 by
 		// loading values into registers.
 		//
@@ -195,20 +209,18 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 		if (!(insn_src && insn_dst))
 			goto next;
 
-		// This should be the same irrespective of the instruction used to load
-		// a value into the register
-		debug("Looking for an instruction loading a value into %s\n", dest_registers[arg_pos]);
-
+		info("Instruction loaded %s into %s\n", insn_src, insn_dst);
 		// We'll handle the fact RDX -> EDX -> DX refer to, essentially, the
 		// same register by matching on the last 2 characters of register
 		// names.
 		// TODO What of the upper/lower 8bit registers, eg. DH / DL?
 		if (0==strncmp(&insn_dst[strlen(insn_dst)-2], dest_registers[arg_pos], strlen(dest_registers[arg_pos]))) {
+			debug("...which is our register of interest!\n");
 
 			// Bail if the argument of index arg_pos isn't a static address
 			// in the memory space of the program
-			if (0==strncmp(insn_src, (const char*) "$0x", 3)) {
-				option_descriptor = (bfd_vma) strtoll(&insn_src[3], NULL, 16);
+			if (0==strncmp(insn_src, (const char*) "0x", 2)) {
+				option_descriptor = (bfd_vma) strtoll(&insn_src[2], NULL, 16);
 				info("Option descriptor at %016"PRIXPTR"\n", (uintptr_t) option_descriptor);
 			}
 		}
