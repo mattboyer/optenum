@@ -326,7 +326,7 @@ asection *find_vma_section(bfd *binary_bfd, bfd_vma vma_to_locate) {
 
 	asection *section_iterator = binary_bfd->sections;
 	while (section_iterator) {
-		if ((vma_to_locate > section_iterator->vma) && (vma_to_locate <= (section_iterator->vma + section_iterator->size)))
+		if ((vma_to_locate >= section_iterator->vma) && (vma_to_locate <= (section_iterator->vma + section_iterator->size)))
 			break;
 
 		section_iterator = section_iterator->next;
