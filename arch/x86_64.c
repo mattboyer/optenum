@@ -29,6 +29,58 @@ SUCH DAMAGE.
 
 #include "x86_64.h"
 
+int x86_64__parse_lea(char* inst_line, char **src, char**dst) {
+	// This should be changed to LEA
+	assert(0==strncmp(inst_line, (const char*) "lea", 3));
+	inst_line = &inst_line[3];
+	unsigned int arg_idx = 0;
+
+	while( (inst_line[arg_idx] != 0x0) && (inst_line[arg_idx] == ' '))
+		arg_idx++;
+	// We've only just skipped past the whitespace to the non-whitespace
+	// comma-separated operand list
+	char *inst_args = &inst_line[arg_idx];
+	unsigned int arg_separator_idx = 0;
+	unsigned int comment_char_idx = 0;
+
+	char *lea_src_buffer = xmalloc(DISASSEMBLY_BUFFER_LENGTH);
+	char *lea_dst_buffer = xmalloc(DISASSEMBLY_BUFFER_LENGTH);
+	char *lea_comment_buffer = xmalloc(DISASSEMBLY_BUFFER_LENGTH);
+
+	// TODO couldn't we use something like calloc() instead?
+	memset(lea_src_buffer, 0x0, DISASSEMBLY_BUFFER_LENGTH);
+	memset(lea_dst_buffer, 0x0, DISASSEMBLY_BUFFER_LENGTH);
+	memset(lea_comment_buffer, 0x0, DISASSEMBLY_BUFFER_LENGTH);
+
+	while( (inst_args[arg_separator_idx] != 0x0) && (inst_args[arg_separator_idx] != ','))
+		arg_separator_idx++;
+	strncpy(lea_src_buffer, inst_args, arg_separator_idx);
+
+	comment_char_idx = arg_separator_idx;
+	while( (inst_args[comment_char_idx] != 0x0) && (inst_args[comment_char_idx] != '#'))
+		comment_char_idx++;
+
+	// This is wrong *and* ugly
+	unsigned int second_arg_end_idx = arg_separator_idx;
+	while( (inst_args[second_arg_end_idx] != 0x0) && (inst_args[second_arg_end_idx] != ' '))
+		second_arg_end_idx++;
+
+	// This is equally wrong
+	unsigned int comment_start_idx = comment_char_idx;
+	while( (inst_args[comment_start_idx] != 0x0) && (inst_args[comment_start_idx] != ' '))
+		comment_start_idx++;
+
+	strncpy(lea_dst_buffer, &inst_args[arg_separator_idx+1], (second_arg_end_idx - arg_separator_idx - 1));
+	strncpy(lea_comment_buffer, &inst_args[comment_start_idx+1], (DISASSEMBLY_BUFFER_LENGTH - (arg_idx + comment_start_idx)));
+
+
+	info("LEA parsed as:\n\tSRC: %s\n\tDST:-%s-\n\tComment: -%s-\n", lea_src_buffer, lea_dst_buffer, lea_comment_buffer);
+	*src = lea_comment_buffer;
+	*dst = lea_dst_buffer;
+
+	return 0;
+}
+
 int x86_64__parse_mov(char* inst_line, char **src, char**dst) {
 	//Do we want the whole line? Yes, I guess we do
 	assert(0==strncmp(inst_line, (const char*) "mov", 3));
@@ -50,7 +102,7 @@ int x86_64__parse_mov(char* inst_line, char **src, char**dst) {
 	while( (inst_args[arg_separator_idx] != 0x0) && (inst_args[arg_separator_idx] != ','))
 		arg_separator_idx++;
 
-	strncpy(mov_src_buffer, inst_args, arg_separator_idx);
+	strncpy(mov_src_buffer, inst_args+1, arg_separator_idx);
 	strncpy(mov_dst_buffer, &inst_args[arg_separator_idx+1], (DISASSEMBLY_BUFFER_LENGTH - (arg_idx + arg_separator_idx)));
 
 	*src = mov_src_buffer;
@@ -124,6 +176,10 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 		if (instruction != first_seen && x86_64__is_call((struct disassembly_ring*) instruction))
 			break;
 
+		// This should be the same irrespective of the instruction used to load
+		// a value into the register
+		debug("Looking for an instruction loading a value into %s\n", dest_registers[arg_pos]);
+
 		// Argument passing (at least for pointers) is done on x86_64 by
 		// loading values into registers.
 		//
@@ -136,38 +192,46 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 		// parsing function is a static pointer to a chunk of read-only data in
 		// the memory space of the binary - ergo we're looking for a hardcoded
 		// value to be the source operand of the MOV
+		char *insn_src = NULL;
+		char *insn_dst = NULL;
+		// TODO Use case instead!!!
 		if (0==strncmp(instruction->stream->buffer, (const char*) "mov", 3)) {
 
 			// Read the source and dest of the MOV
-			char *mov_src = NULL;
-			char *mov_dst = NULL;
-			x86_64__parse_mov(instruction->stream->buffer, &mov_src, &mov_dst);
-			debug("MOV src:%s\tdst:%s\n", mov_src, mov_dst);
-
-			debug("Looking for a MOV into %s\n", dest_registers[arg_pos]);
-
-			// We'll handle the fact RDX -> EDX -> DX refer to, essentially, the
-			// same register by matching on the last 2 characters of register
-			// names.
-			// TODO What of the upper/lower 8bit registers, eg. DH / DL?
-			if (0==strncmp(&mov_dst[strlen(mov_dst)-2], dest_registers[arg_pos], strlen(dest_registers[arg_pos]))) {
-
-				// Bail if the argument of index arg_pos isn't a static address
-				// in the memory space of the program
-				if (0==strncmp(mov_src, (const char*) "$0x", 3)) {
-					option_descriptor = (bfd_vma) strtoll(&mov_src[3], NULL, 16);
-					info("Option descriptor at %016"PRIXPTR"\n", (uintptr_t) option_descriptor);
-				}
-			}
-
-			free(mov_src);
-			free(mov_dst);
+			x86_64__parse_mov(instruction->stream->buffer, &insn_src, &insn_dst);
+			debug("MOV src:%s\tdst:%s\n", insn_src, insn_dst);
 		}
+		if (0==strncmp(instruction->stream->buffer, (const char*) "lea", 3)) {
+			// Read the source and dest of the LEA
+			x86_64__parse_lea(instruction->stream->buffer, &insn_src, &insn_dst);
+			debug("LEA src:%s\tdst:%s\n", insn_src, insn_dst);
+		}
+		if (!(insn_src && insn_dst))
+			goto next;
+
+		info("Instruction loaded %s into %s\n", insn_src, insn_dst);
+		// We'll handle the fact RDX -> EDX -> DX refer to, essentially, the
+		// same register by matching on the last 2 characters of register
+		// names.
+		// TODO What of the upper/lower 8bit registers, eg. DH / DL?
+		if (0==strncmp(&insn_dst[strlen(insn_dst)-2], dest_registers[arg_pos], strlen(dest_registers[arg_pos]))) {
+
+			// Bail if the argument of index arg_pos isn't a static address
+			// in the memory space of the program
+			if (0==strncmp(insn_src, (const char*) "0x", 2)) {
+				option_descriptor = (bfd_vma) strtoll(&insn_src[2], NULL, 16);
+				info("Option descriptor at %016"PRIXPTR"\n", (uintptr_t) option_descriptor);
+			}
+		}
+
+		free(insn_src);
+		free(insn_dst);
+
 
 		if (option_descriptor)
 			break;
 
-
+next:
 		instruction = instruction->prev;
 		if (instruction == first_seen)
 			break;

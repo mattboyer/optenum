@@ -36,6 +36,7 @@ SUCH DAMAGE.
 
 bfd_vma x86_64__parse_call_address(char*);
 
+int x86_64__parse_lea(char*, char **, char **);
 int x86_64__parse_mov(char*, char **, char **);
 bool x86_64__is_call(struct disassembly_ring *);
 bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *,
