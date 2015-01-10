@@ -81,10 +81,9 @@ struct parsed_option_list *iterate_long_opts(bfd *binary_bfd, const bfd_vma long
 	size_t longopt_offset = (longopts - longopt_section->vma);
 	info("longopts live in section %s at offset %ld\n", longopt_section->name, longopt_offset);
 
-	char *all_zeroes = alloca(sizeof(struct option));
-	memset(all_zeroes, 0x0, sizeof(struct option));
+	const char *all_zeroes = calloc(1, sizeof(struct option));
 
-	while (longopt_offset) {
+	while (longopt_offset < longopt_section->size) {
 
 		/* As per the man page for getopt_long(3), the last element in
 		 * the array of struct option elements has to be all zeroes

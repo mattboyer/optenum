@@ -215,7 +215,6 @@ bfd_vma x86_64__parse_ring_for_call_arg(const struct disassembly_ring *instructi
 		// names.
 		// TODO What of the upper/lower 8bit registers, eg. DH / DL?
 		if (0==strncmp(&insn_dst[strlen(insn_dst)-2], dest_registers[arg_pos], strlen(dest_registers[arg_pos]))) {
-			debug("...which is our register of interest!\n");
 
 			// Bail if the argument of index arg_pos isn't a static address
 			// in the memory space of the program
