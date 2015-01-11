@@ -51,7 +51,7 @@ SUCH DAMAGE.
 // Below this line, we'll be including header files for invidal argument
 // parsing modules
 #include "parsers/getopt.h"
-#ifdef HAVE_GLIB
+#ifdef HAVE_GLIB2
 #include "parsers/glib.h"
 #endif
 #ifdef HAVE_POPT
@@ -60,7 +60,7 @@ SUCH DAMAGE.
 
 struct option_parsing_function parsers[]={
 	getopt_parsers
-#ifdef HAVE_GLIB
+#ifdef HAVE_GLIB2
 	glib_parsers
 #endif
 #ifdef HAVE_POPT
