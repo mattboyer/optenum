@@ -88,22 +88,18 @@ if (GLIB2_FOUND)
 	endif (GLIB2_HEADER)
 endif (GLIB2_FOUND)
 
-pkg_check_modules (POPT popt)
-if (POPT_FOUND)
-	find_file(POPT_HEADER "popt.h")
-	if (POPT_HEADER)
-		message(STATUS "Building parser for popt's poptGetContext - "
-			"header at ${POPT_HEADER}")
-		include_directories (${POPT_INCLUDE_DIRS})
-		list (APPEND ${PROJECT_NAME}_SRCS parsers/popt.c)
-		file (APPEND "${PROJECT_BINARY_DIR}/optenum_config.h"
-			"#define HAVE_POPT\n"
-		)
-	else (POPT_HEADER)
-		message(WARNING "popt is installed but its header files"
-			" couldn't be found")
-	endif (POPT_HEADER)
-endif (POPT_FOUND)
+find_file(POPT_HEADER "popt.h")
+if (POPT_HEADER)
+	message(STATUS "Building parser for popt's poptGetContext - "
+		"header at ${POPT_HEADER}")
+	include_directories (${POPT_INCLUDE_DIRS})
+	list (APPEND ${PROJECT_NAME}_SRCS parsers/popt.c)
+	file (APPEND "${PROJECT_BINARY_DIR}/optenum_config.h"
+		"#define HAVE_POPT\n"
+	)
+else (POPT_HEADER)
+	message(WARNING "Header file for popt couldn't be found")
+endif (POPT_HEADER)
 
 find_library(LIBCHECK "check")
 find_file(CHECK_HEADER "check.h")
